@@ -1,4 +1,9 @@
-// Tipi generati per Supabase Database
+// ============================================
+// SUPABASE DATABASE TYPES
+// ============================================
+// Generato/aggiornato con: pnpm db:types
+// Oppure manualmente dal dashboard Supabase
+
 export type Json =
   | string
   | number
@@ -79,6 +84,7 @@ export interface Database {
           tipo_prova: string[]
           emoji: string
           scadenza: string | null
+          attiva: boolean
           created_at: string
         }
         Insert: {
@@ -91,6 +97,7 @@ export interface Database {
           tipo_prova?: string[]
           emoji?: string
           scadenza?: string | null
+          attiva?: boolean
           created_at?: string
         }
         Update: {
@@ -103,6 +110,7 @@ export interface Database {
           tipo_prova?: string[]
           emoji?: string
           scadenza?: string | null
+          attiva?: boolean
           created_at?: string
         }
       }
@@ -289,12 +297,16 @@ export interface Database {
     }
     Functions: {
       assign_random_team: {
-        Args: { user_id: string }
+        Args: { p_user_id: string }
         Returns: string
       }
-      validate_proof: {
-        Args: { prova_id: string }
-        Returns: boolean
+      check_proof_validation: {
+        Args: Record<PropertyKey, never>
+        Returns: unknown
+      }
+      assign_gara_winner: {
+        Args: { p_gara_id: string; p_vincitore_id: string }
+        Returns: void
       }
     }
     Enums: {
@@ -302,3 +314,4 @@ export interface Database {
     }
   }
 }
+
