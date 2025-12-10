@@ -4,6 +4,7 @@ import { Fingerprint, Sparkles, PartyPopper } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { Countdown } from '../components/Countdown';
+import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 
 type ViewState = 'splash' | 'video-pre' | 'auth' | 'video-post' | 'loading';
 
@@ -13,7 +14,6 @@ export const SplashPage: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>('splash');
   const [nickname, setNickname] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
-  const [showPWAPrompt, setShowPWAPrompt] = useState(false);
   const [showPostVideo, setShowPostVideo] = useState(false); // Flag per video post
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -27,16 +27,6 @@ export const SplashPage: React.FC = () => {
       navigate('/home', { replace: true });
     }
   }, [isAuthenticated, navigate, viewState, showPostVideo]);
-
-  // Check if PWA can be installed
-  useEffect(() => {
-    const checkPWA = () => {
-      if ('standalone' in window.navigator && !(window.navigator as unknown as { standalone: boolean }).standalone) {
-        setShowPWAPrompt(true);
-      }
-    };
-    setTimeout(checkPWA, 2000);
-  }, []);
 
   // Handle "Entra nel Game" click - show pre-registration video
   const handleEnterGame = () => {
@@ -277,26 +267,10 @@ export const SplashPage: React.FC = () => {
             </motion.div>
           ) : null}
         </AnimatePresence>
-
-        {/* PWA Install Prompt */}
-        <AnimatePresence>
-          {showPWAPrompt && viewState === 'splash' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="glass rounded-xl p-4 text-center"
-            >
-              <p className="text-sm text-gray-300 mb-2">
-                📱 Aggiungi alla Home per giocare offline!
-              </p>
-              <p className="text-xs text-gray-500">
-                Tocca "Condividi" → "Aggiungi alla schermata Home"
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
+
+      {/* PWA Install Prompt - Shows automatically when app is not installed */}
+      {viewState === 'splash' && <PWAInstallPrompt delay={2000} autoShow={true} />}
 
       {/* Footer */}
       <motion.p 
