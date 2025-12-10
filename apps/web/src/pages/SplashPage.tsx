@@ -88,12 +88,12 @@ export const SplashPage: React.FC = () => {
         {/* Overlay scuro */}
         <div className="absolute inset-0 bg-black/80 z-40" />
         
-        {/* Modale con video */}
+        {/* Modale con video verticale */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className="relative z-50 w-[90%] max-w-2xl aspect-video bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
+          className="relative z-50 w-[85%] max-w-md aspect-[9/16] bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
         >
           <video
             ref={videoRef}
@@ -101,7 +101,7 @@ export const SplashPage: React.FC = () => {
             autoPlay
             playsInline
             onEnded={handlePreVideoEnd}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
           
           {/* Skip button */}
@@ -126,12 +126,12 @@ export const SplashPage: React.FC = () => {
         {/* Overlay scuro */}
         <div className="absolute inset-0 bg-black/80 z-40" />
         
-        {/* Modale con video */}
+        {/* Modale con video verticale */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className="relative z-50 w-[90%] max-w-2xl aspect-video bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
+          className="relative z-50 w-[85%] max-w-md aspect-[9/16] bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
         >
           <video
             ref={videoRef}
@@ -139,7 +139,7 @@ export const SplashPage: React.FC = () => {
             autoPlay
             playsInline
             onEnded={handlePostVideoEnd}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
           />
           
           {/* Skip button */}
