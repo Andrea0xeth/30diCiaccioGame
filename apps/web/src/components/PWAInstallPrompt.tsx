@@ -20,7 +20,6 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   // Monitor isInstalled and close prompt automatically when app is installed
   useEffect(() => {
     if (isInstalled) {
-      console.log('PWAInstallPrompt - App installed! Closing prompt.');
       setShowPrompt(false);
       return;
     }
@@ -30,7 +29,6 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
       const standalone = window.matchMedia('(display-mode: standalone)').matches || 
                         (window.navigator as any).standalone === true;
       if (standalone) {
-        console.log('PWAInstallPrompt - Detected standalone mode! Closing prompt.');
         setShowPrompt(false);
         clearInterval(checkInterval);
       }
@@ -52,7 +50,6 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
           (e.metaKey && e.key === 'r')) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('PWAInstallPrompt - Prevented close attempt with key:', e.key);
         return false;
       }
     };
@@ -74,9 +71,6 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   }, [showPrompt]);
 
   useEffect(() => {
-    // Debug logging
-    console.log('PWAInstallPrompt - isInstalled:', isInstalled, 'isInstallable:', isInstallable, 'canShowPrompt:', canShowPrompt, 'isIOS:', isIOS);
-
     // FORCE SHOW: Auto-show prompt if not installed and auto-show is enabled
     // Show regardless of browser support - we'll show instructions for all platforms
     // If forceShow is true, always show if not installed
@@ -85,15 +79,11 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
       : (autoShow && !isInstalled);
     
     if (shouldShow) {
-      console.log('PWAInstallPrompt - Will show prompt after delay:', delay);
       const timer = setTimeout(() => {
-        console.log('PWAInstallPrompt - Showing prompt now!');
         setShowPrompt(true);
       }, delay);
 
       return () => clearTimeout(timer);
-    } else {
-      console.log('PWAInstallPrompt - Not showing:', { autoShow, isInstalled, forceShow });
     }
   }, [isInstalled, autoShow, delay, isInstallable, canShowPrompt, isIOS, forceShow]);
 
@@ -102,10 +92,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     if (promptInstall) {
       const installed = await promptInstall();
       // Don't close manually - let the useEffect handle it when isInstalled becomes true
-      if (installed) {
-        // The prompt will close automatically via the useEffect that monitors isInstalled
-        console.log('PWAInstallPrompt - Installation accepted, waiting for isInstalled to update...');
-      }
+      // The prompt will close automatically via the useEffect that monitors isInstalled
     }
     // If no prompt available, the user must install manually
     // The prompt will remain open until isInstalled becomes true
