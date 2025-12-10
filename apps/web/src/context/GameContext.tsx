@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User, Squadra, Quest, ProvaQuest, Gara, GameState, Notifica, RegistrationData } from '../types';
-import { registerPasskey, authenticateWithPasskey, isWebAuthnSupported } from '../lib/webauthn';
+import type { Database } from '../lib/database.types';
+import { registerPasskey, isWebAuthnSupported } from '../lib/webauthn';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 // Mock data per demo (quando Supabase non è configurato)
@@ -193,13 +194,21 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             }
             
             // Aggiorna i dati utente con quelli del database
+            const userData = data as Database['public']['Tables']['users']['Row'];
             setUser({
-              ...data,
-              nome: data.nome,
-              cognome: data.cognome,
-              email: data.email,
-              telefono: data.telefono,
-              data_nascita: data.data_nascita,
+              id: userData.id,
+              nickname: userData.nickname,
+              nome: userData.nome || undefined,
+              cognome: userData.cognome || undefined,
+              email: userData.email || undefined,
+              telefono: userData.telefono || undefined,
+              data_nascita: userData.data_nascita || undefined,
+              avatar: userData.avatar || undefined,
+              passkey_id: userData.passkey_id || undefined,
+              squadra_id: userData.squadra_id,
+              punti_personali: userData.punti_personali,
+              is_admin: userData.is_admin,
+              created_at: userData.created_at,
             });
           } catch (error) {
             console.error('Errore caricamento utente:', error);
@@ -247,10 +256,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             .select('id')
             .order('punti_squadra', { ascending: true });
           
-          const squadreIds = squadreData?.map(s => s.id) || [];
+          const squadreIds = squadreData?.map((s: Database['public']['Tables']['squadre']['Row']) => s.id) || [];
           const randomSquadraId = squadreIds[Math.floor(Math.random() * squadreIds.length)] || null;
 
           // Crea l'utente nel database
+          // Crea l'utente nel database con type assertion per evitare problemi di tipo
           const { data: userData, error: userError } = await supabase
             .from('users')
             .insert({
@@ -265,28 +275,30 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
               squadra_id: randomSquadraId,
               punti_personali: 0,
               is_admin: registrationData.email?.toLowerCase() === 'admin@30diciaccio.it',
-            })
+            } as any)
             .select()
             .single();
 
-          if (userError) {
+          if (userError || !userData) {
             console.error('Errore creazione utente:', userError);
             throw new Error('Errore durante la registrazione nel database');
           }
 
+          const dbUser = userData as Database['public']['Tables']['users']['Row'];
           const newUser: User = {
-            id: userData.id,
-            nickname: userData.nickname,
-            nome: userData.nome,
-            cognome: userData.cognome,
-            email: userData.email,
-            telefono: userData.telefono,
-            data_nascita: userData.data_nascita,
-            passkey_id: userData.passkey_id,
-            squadra_id: userData.squadra_id,
-            punti_personali: userData.punti_personali,
-            is_admin: userData.is_admin,
-            created_at: userData.created_at,
+            id: dbUser.id,
+            nickname: dbUser.nickname,
+            nome: dbUser.nome || undefined,
+            cognome: dbUser.cognome || undefined,
+            email: dbUser.email || undefined,
+            telefono: dbUser.telefono || undefined,
+            data_nascita: dbUser.data_nascita || undefined,
+            avatar: dbUser.avatar || undefined,
+            passkey_id: dbUser.passkey_id || undefined,
+            squadra_id: dbUser.squadra_id,
+            punti_personali: dbUser.punti_personali,
+            is_admin: dbUser.is_admin,
+            created_at: dbUser.created_at,
           };
 
           setUser(newUser);
