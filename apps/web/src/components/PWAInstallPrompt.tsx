@@ -166,24 +166,27 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                       <Sparkles className="w-6 h-6 text-party-300" />
                     </h3>
                     <p className="text-gray-300 text-base">
-                      Per un'esperienza migliore, aggiungi questa app alla tua schermata Home!
+                      Per continuare, devi aggiungere questa app alla tua schermata Home!
+                    </p>
+                    <p className="text-xs text-gray-400 italic">
+                      Su iOS devi farlo manualmente dal browser
                     </p>
                   </div>
                   
                   <div className="bg-dark/70 rounded-xl p-4 w-full border border-white/10">
-                    <p className="text-sm text-gray-300 mb-3 font-semibold">Come installare:</p>
+                    <p className="text-sm text-gray-300 mb-3 font-semibold">Come installare (iOS):</p>
                     <ol className="text-sm text-gray-200 space-y-2 text-left">
                       <li className="flex items-start gap-2">
                         <span className="font-bold text-coral-400">1.</span>
-                        <span>Tocca il pulsante <span className="font-semibold text-white">Condividi</span> <span className="text-gray-400">(□↑)</span> in basso</span>
+                        <span>Tocca il pulsante <span className="font-semibold text-white">Condividi</span> <span className="text-gray-400">(□↑)</span> in basso nella barra del browser</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold text-coral-400">2.</span>
-                        <span>Seleziona <span className="font-semibold text-white">"Aggiungi alla schermata Home"</span></span>
+                        <span>Scorri e seleziona <span className="font-semibold text-white">"Aggiungi alla schermata Home"</span></span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="font-bold text-coral-400">3.</span>
-                        <span>Conferma con <span className="font-semibold text-white">"Aggiungi"</span></span>
+                        <span>Conferma con <span className="font-semibold text-white">"Aggiungi"</span> in alto a destra</span>
                       </li>
                     </ol>
                   </div>
@@ -191,6 +194,9 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                   <div className="w-full p-3 bg-coral-500/20 rounded-lg border border-coral-500/30">
                     <p className="text-sm text-coral-300 text-center font-semibold">
                       ⚠️ Devi installare l'app per continuare
+                    </p>
+                    <p className="text-xs text-coral-400/80 text-center mt-1">
+                      Il modale si chiuderà automaticamente quando l'app sarà installata
                     </p>
                   </div>
                 </div>
@@ -252,21 +258,26 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 </div>
                 
                 <div className="w-full space-y-3">
-                  {isInstallable ? (
-                    <button
-                      onClick={handleInstall}
-                      className="btn-primary w-full flex items-center justify-center gap-3 py-4 text-base font-bold shadow-xl"
-                    >
-                      <Download size={22} />
-                      Installa ora
-                    </button>
+                  {isInstallable && promptInstall ? (
+                    <>
+                      <button
+                        onClick={handleInstall}
+                        className="btn-primary w-full flex items-center justify-center gap-3 py-4 text-base font-bold shadow-xl"
+                      >
+                        <Download size={22} />
+                        Installa ora (automatico)
+                      </button>
+                      <p className="text-xs text-gray-400 text-center">
+                        Clicca per aprire il prompt di installazione del browser
+                      </p>
+                    </>
                   ) : (
                     <div className="bg-dark/70 rounded-xl p-4 w-full border border-white/10">
-                      <p className="text-sm text-gray-300 mb-2 font-semibold">Come installare:</p>
+                      <p className="text-sm text-gray-300 mb-2 font-semibold">Come installare manualmente:</p>
                       <ol className="text-sm text-gray-200 space-y-1.5 text-left">
                         <li className="flex items-start gap-2">
                           <span className="font-bold text-coral-400">1.</span>
-                          <span>Clicca sul menu del browser (tre puntini)</span>
+                          <span>Clicca sul menu del browser (tre puntini in alto a destra)</span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="font-bold text-coral-400">2.</span>
@@ -274,15 +285,21 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="font-bold text-coral-400">3.</span>
-                          <span>Conferma l'installazione</span>
+                          <span>Conferma l'installazione nel popup del browser</span>
                         </li>
                       </ol>
+                      <p className="text-xs text-gray-400 mt-2 italic">
+                        Il browser non supporta l'installazione automatica, devi farlo manualmente
+                      </p>
                     </div>
                   )}
                   
                   <div className="w-full p-3 bg-coral-500/20 rounded-lg border border-coral-500/30">
                     <p className="text-sm text-coral-300 text-center font-semibold">
                       ⚠️ Devi installare l'app per continuare
+                    </p>
+                    <p className="text-xs text-coral-400/80 text-center mt-1">
+                      Il modale si chiuderà automaticamente quando l'app sarà installata
                     </p>
                   </div>
                 </div>
