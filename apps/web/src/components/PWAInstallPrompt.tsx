@@ -90,7 +90,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
   const handleInstall = async () => {
     // If we have the deferred prompt, use it
     if (promptInstall) {
-      const installed = await promptInstall();
+      await promptInstall();
       // Don't close manually - let the useEffect handle it when isInstalled becomes true
       // The prompt will close automatically via the useEffect that monitors isInstalled
     }
@@ -245,7 +245,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                 </div>
                 
                 <div className="w-full space-y-3">
-                  {isInstallable && promptInstall ? (
+                  {isInstallable ? (
                     <>
                       <button
                         onClick={handleInstall}
