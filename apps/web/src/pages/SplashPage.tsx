@@ -84,26 +84,37 @@ export const SplashPage: React.FC = () => {
   // Video Pre-Iscrizione
   if (viewState === 'video-pre') {
     return (
-      <div className="h-screen bg-dark flex flex-col items-center justify-center relative overflow-hidden">
-        <video
-          ref={videoRef}
-          src="/videos/BenvenutoPreIscrizione.mp4"
-          autoPlay
-          playsInline
-          onEnded={handlePreVideoEnd}
-          className="w-full h-full object-contain max-h-screen"
-        />
+      <div className="h-screen bg-dark flex items-center justify-center relative overflow-hidden">
+        {/* Overlay scuro */}
+        <div className="absolute inset-0 bg-black/80 z-40" />
         
-        {/* Skip button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          onClick={handleSkipVideo}
-          className="absolute bottom-8 right-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/70 hover:bg-white/20 transition-colors"
+        {/* Modale con video */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="relative z-50 w-[90%] max-w-2xl aspect-video bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
         >
-          Salta →
-        </motion.button>
+          <video
+            ref={videoRef}
+            src="/videos/BenvenutoPreIscrizione.mp4"
+            autoPlay
+            playsInline
+            onEnded={handlePreVideoEnd}
+            className="w-full h-full object-contain"
+          />
+          
+          {/* Skip button */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+            onClick={handleSkipVideo}
+            className="absolute bottom-4 right-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/70 hover:bg-white/20 transition-colors"
+          >
+            Salta →
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
@@ -111,26 +122,37 @@ export const SplashPage: React.FC = () => {
   // Video Post-Iscrizione
   if (viewState === 'video-post') {
     return (
-      <div className="h-screen bg-dark flex flex-col items-center justify-center relative overflow-hidden">
-        <video
-          ref={videoRef}
-          src="/videos/BenvenutoPostiscrizione.mp4"
-          autoPlay
-          playsInline
-          onEnded={handlePostVideoEnd}
-          className="w-full h-full object-contain max-h-screen"
-        />
+      <div className="h-screen bg-dark flex items-center justify-center relative overflow-hidden">
+        {/* Overlay scuro */}
+        <div className="absolute inset-0 bg-black/80 z-40" />
         
-        {/* Skip button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          onClick={handleSkipVideo}
-          className="absolute bottom-8 right-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/70 hover:bg-white/20 transition-colors"
+        {/* Modale con video */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="relative z-50 w-[90%] max-w-2xl aspect-video bg-gray-900 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl"
         >
-          Salta →
-        </motion.button>
+          <video
+            ref={videoRef}
+            src="/videos/BenvenutoPostiscrizione.mp4"
+            autoPlay
+            playsInline
+            onEnded={handlePostVideoEnd}
+            className="w-full h-full object-contain"
+          />
+          
+          {/* Skip button */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+            onClick={handleSkipVideo}
+            className="absolute bottom-4 right-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/70 hover:bg-white/20 transition-colors"
+          >
+            Salta →
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
