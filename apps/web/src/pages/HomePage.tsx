@@ -5,6 +5,7 @@ import { useGame } from '../context/GameContext';
 import { QuestCard } from '../components/QuestCard';
 import { VerificaCard } from '../components/VerificaCard';
 import { GaraCard } from '../components/GaraCard';
+import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 
 export const HomePage: React.FC = () => {
   const { 
@@ -114,7 +115,8 @@ export const HomePage: React.FC = () => {
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-display font-bold text-sm flex items-center gap-2">
-              🎯 Quest del Giorno
+              <CircusNeonDecorations variant="star" size="small" color="red" />
+              Quest del Giorno
             </h2>
             <span className="text-[10px] text-gray-500">{quests.length} disponibili</span>
           </div>
@@ -140,7 +142,7 @@ export const HomePage: React.FC = () => {
         {nextGara && (
           <section>
             <h2 className="font-display font-bold text-sm flex items-center gap-2 mb-3">
-              <Swords size={16} className="text-coral-500" />
+              <CircusNeonDecorations variant="clown-face" size="small" color="orange" />
               Prossima Gara
             </h2>
             <GaraCard gara={nextGara} />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Users, User, TrendingUp, TrendingDown, Minus, Crown, Flame } from 'lucide-react';
 import { useGame } from '../context/GameContext';
+import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 
 type TabType = 'squadre' | 'singoli';
 
@@ -63,7 +64,11 @@ export const LeaderboardPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-3"
         >
-          <Trophy className="w-8 h-8 text-party-300 mx-auto mb-1" />
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <CircusNeonDecorations variant="star" size="small" color="red" />
+            <Trophy className="w-8 h-8 text-party-300" />
+            <CircusNeonDecorations variant="star" size="small" color="white" />
+          </div>
           <h1 className="text-lg font-display font-bold">Classifica</h1>
           <p className="text-gray-500 text-[10px]">Chi vincerà il 30diCiaccioGame?</p>
         </motion.div>

@@ -6,3 +6,4 @@ export { Countdown } from './Countdown';
 export { GaraCard } from './GaraCard';
 export { PWAInstallPrompt } from './PWAInstallPrompt';
 export { UpdateNotification } from './UpdateNotification';
+export { CircusNeonDecorations, FloatingCircusDecorations } from './CircusNeonDecorations';

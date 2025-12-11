@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Gift, Star, Zap, Users, User, Calendar, Sparkles } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import type { Premio } from '../types';
+import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 
 const mockPremi: Premio[] = [
   {
@@ -101,7 +102,11 @@ export const PremiPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-2"
         >
-          <Gift className="w-8 h-8 text-party-300 mx-auto mb-1" />
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <CircusNeonDecorations variant="confetti" size="small" color="orange" />
+            <Gift className="w-8 h-8 text-party-300" />
+            <CircusNeonDecorations variant="confetti" size="small" color="red" />
+          </div>
           <h1 className="text-lg font-display font-bold">Premi</h1>
           <p className="text-gray-500 text-[10px]">Cosa puoi vincere al 30diCiaccioGame!</p>
         </motion.div>

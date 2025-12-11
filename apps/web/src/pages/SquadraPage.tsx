@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Users, Trophy, Flame, Crown, Swords } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { GaraCard } from '../components/GaraCard';
+import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 
 export const SquadraPage: React.FC = () => {
   const { user, mySquadra, gare, leaderboardSquadre } = useGame();
@@ -45,13 +46,17 @@ export const SquadraPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-4xl mb-1"
-          >
-            {mySquadra.emoji}
-          </motion.div>
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <CircusNeonDecorations variant="balloon" size="small" color="red" />
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-4xl"
+            >
+              {mySquadra.emoji}
+            </motion.div>
+            <CircusNeonDecorations variant="balloon" size="small" color="white" />
+          </div>
           <h1 className="text-xl font-display font-bold mb-1">{mySquadra.nome}</h1>
           <div className="flex items-center justify-center gap-3">
             <div className="flex items-center gap-0.5 text-gray-400">
