@@ -7,9 +7,10 @@ interface GaraCardProps {
   gara: Gara;
   isAdmin?: boolean;
   onAssegnaVincitore?: (garaId: string, vincitoreId: string) => void;
+  onAssegnaClassifica?: (garaId: string, classifiche: Array<{squadra_id: string, posizione: number}>) => void;
 }
 
-export const GaraCard: React.FC<GaraCardProps> = ({ gara, isAdmin, onAssegnaVincitore }) => {
+export const GaraCard: React.FC<GaraCardProps> = ({ gara, isAdmin, onAssegnaVincitore, onAssegnaClassifica }) => {
   const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString('it-IT', {
       hour: '2-digit',
@@ -81,31 +82,68 @@ export const GaraCard: React.FC<GaraCardProps> = ({ gara, isAdmin, onAssegnaVinc
       </h3>
       <p className="text-center text-xs text-gray-500 mb-2 line-clamp-2">{gara.descrizione}</p>
 
-      {/* Winner Badge - Compact */}
-      {isCompleted && gara.vincitore_id && (
+      {/* Classifica o Vincitore - Compact */}
+      {isCompleted && gara.classifica && gara.classifica.length > 0 ? (
+        <div className="space-y-1 mb-2">
+          <div className="text-center text-xs text-gray-400 mb-1">Classifica Finale</div>
+          {gara.classifica.slice(0, 3).map((item, index) => (
+            <div
+              key={item.squadra_id}
+              className={`flex items-center justify-between p-1.5 rounded-lg text-xs ${
+                index === 0 ? 'bg-party-300/20' :
+                index === 1 ? 'bg-gray-400/20' :
+                index === 2 ? 'bg-orange-500/20' :
+                'glass'
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold w-4">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${item.posizione}°`}</span>
+                <span className="text-lg">{item.squadra_emoji}</span>
+                <span className="font-semibold truncate">{item.squadra_nome}</span>
+              </div>
+              <span className="text-party-300 font-bold">+{item.punti_assegnati}pts</span>
+            </div>
+          ))}
+        </div>
+      ) : isCompleted && gara.vincitore_id ? (
         <div className="flex items-center justify-center gap-1.5 text-green-400 mb-2">
           <Trophy size={14} />
           <span className="font-semibold text-xs">
             Vincitore: {gara.vincitore_id === gara.squadra_a_id ? gara.squadra_a?.nome : gara.squadra_b?.nome}
           </span>
         </div>
-      )}
+      ) : null}
 
       {/* Admin Controls - Compact */}
       {isAdmin && !isCompleted && (
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => onAssegnaVincitore?.(gara.id, gara.squadra_a_id)}
-            className="flex-1 py-2 rounded-2xl glass text-xs font-medium transition-colors"
-          >
-            {gara.squadra_a?.emoji} Vince
-          </button>
-          <button
-            onClick={() => onAssegnaVincitore?.(gara.id, gara.squadra_b_id)}
-            className="flex-1 py-2 rounded-2xl glass text-xs font-medium transition-colors"
-          >
-            {gara.squadra_b?.emoji} Vince
-          </button>
+        <div className="space-y-1.5">
+          {onAssegnaClassifica ? (
+            <button
+              onClick={() => {
+                // Questo verrà gestito dal componente padre
+                const event = new CustomEvent('open-classifica-modal', { detail: { gara } });
+                window.dispatchEvent(event);
+              }}
+              className="w-full py-2 rounded-2xl bg-coral-500 text-white text-xs font-medium transition-colors hover:bg-coral-600"
+            >
+              Definisci Classifica
+            </button>
+          ) : onAssegnaVincitore ? (
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => onAssegnaVincitore(gara.id, gara.squadra_a_id)}
+                className="flex-1 py-2 rounded-2xl glass text-xs font-medium transition-colors"
+              >
+                {gara.squadra_a?.emoji} Vince
+              </button>
+              <button
+                onClick={() => onAssegnaVincitore(gara.id, gara.squadra_b_id)}
+                className="flex-1 py-2 rounded-2xl glass text-xs font-medium transition-colors"
+              >
+                {gara.squadra_b?.emoji} Vince
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
     </motion.div>

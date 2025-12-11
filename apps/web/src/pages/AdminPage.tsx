@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Crown, Swords, Gift, Users, Search, Plus, Check, X, Trophy, Shuffle } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { GaraCard } from '../components/GaraCard';
+import { ClassificaGaraModal } from '../components/ClassificaGaraModal';
+import { CreaGaraModal } from '../components/CreaGaraModal';
+import type { Gara } from '../types';
 
 type TabType = 'gare' | 'bonus' | 'squadre';
 
@@ -12,7 +15,9 @@ export const AdminPage: React.FC = () => {
     gare, 
     squadre, 
     leaderboardSingoli,
-    assegnaVincitore, 
+    assegnaVincitore,
+    assegnaClassifica,
+    creaGara,
     aggiungiBonus 
   } = useGame();
 
@@ -22,6 +27,20 @@ export const AdminPage: React.FC = () => {
   const [bonusPoints, setBonusPoints] = useState('');
   const [bonusMotivo, setBonusMotivo] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedGaraForClassifica, setSelectedGaraForClassifica] = useState<Gara | null>(null);
+  const [showCreaGara, setShowCreaGara] = useState(false);
+
+  // Listener per aprire il modal classifica
+  useEffect(() => {
+    const handleOpenClassifica = (event: CustomEvent) => {
+      setSelectedGaraForClassifica(event.detail.gara);
+    };
+
+    window.addEventListener('open-classifica-modal' as any, handleOpenClassifica as EventListener);
+    return () => {
+      window.removeEventListener('open-classifica-modal' as any, handleOpenClassifica as EventListener);
+    };
+  }, []);
 
   // Check admin access
   if (!user?.is_admin) {
@@ -141,10 +160,19 @@ export const AdminPage: React.FC = () => {
               exit={{ opacity: 0, x: 20 }}
               className="space-y-4 pt-4"
             >
-              <h2 className="font-display font-bold text-lg flex items-center gap-2">
-                <Trophy size={20} className="text-coral-500" />
-                Gare Attive
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-display font-bold text-lg flex items-center gap-2">
+                  <Trophy size={20} className="text-coral-500" />
+                  Gare Attive
+                </h2>
+                <button
+                  onClick={() => setShowCreaGara(true)}
+                  className="btn-primary flex items-center gap-2 text-sm py-2 px-4"
+                >
+                  <Plus size={16} />
+                  Nuova Gara
+                </button>
+              </div>
               
               {gare.filter(g => g.stato !== 'completata').length === 0 ? (
                 <div className="card text-center py-12 text-gray-500">
@@ -160,6 +188,10 @@ export const AdminPage: React.FC = () => {
                       gara={gara} 
                       isAdmin 
                       onAssegnaVincitore={assegnaVincitore}
+                      onAssegnaClassifica={async (garaId, classifiche) => {
+                        await assegnaClassifica(garaId, classifiche);
+                        setSelectedGaraForClassifica(null);
+                      }}
                     />
                   ))
               )}
@@ -177,7 +209,15 @@ export const AdminPage: React.FC = () => {
                 gare
                   .filter(g => g.stato === 'completata')
                   .map((gara) => (
-                    <GaraCard key={gara.id} gara={gara} />
+                    <GaraCard 
+                      key={gara.id} 
+                      gara={gara} 
+                      isAdmin
+                      onAssegnaClassifica={async (garaId, classifiche) => {
+                        await assegnaClassifica(garaId, classifiche);
+                        setSelectedGaraForClassifica(null);
+                      }}
+                    />
                   ))
               )}
             </motion.div>

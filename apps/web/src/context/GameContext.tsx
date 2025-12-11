@@ -27,6 +27,16 @@ interface GameContextType {
   submitProva: (questId: string, tipo: 'foto' | 'video' | 'testo', contenuto: string | File) => Promise<void>;
   votaProva: (provaId: string, valore: boolean) => Promise<void>;
   assegnaVincitore: (garaId: string, vincitoreId: string) => Promise<void>;
+  assegnaClassifica: (garaId: string, classifiche: Array<{squadra_id: string, posizione: number}>) => Promise<void>;
+  creaGara: (gara: {
+    nome: string;
+    descrizione: string;
+    squadra_a_id: string;
+    squadra_b_id: string;
+    punti_in_palio: number;
+    orario: string;
+    giorno: number;
+  }) => Promise<void>;
   aggiungiBonus: (userId: string, punti: number, motivo: string) => Promise<void>;
   refreshData: () => Promise<void>;
   
@@ -139,28 +149,91 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
       // Carica quest del giorno corrente
       const giornoCorrente = gameStateData ? (gameStateData as Database['public']['Tables']['game_state']['Row']).giorno_corrente : 1;
-      const { data: questsData, error: questsError } = await supabase
-        .from('quest')
-        .select('*')
-        .eq('giorno', giornoCorrente)
-        .eq('attiva', true)
-        .order('punti', { ascending: false });
+      
+      // Se c'è un utente, carica le sue quest assegnate, altrimenti carica tutte le quest (per admin/preview)
+      if (user) {
+        // Assegna le quest giornaliere se non già assegnate
+        const { error: assignError } = await supabase.rpc('assign_daily_quests', {
+          p_user_id: user.id,
+          p_giorno: giornoCorrente,
+        });
 
-      if (questsError) throw questsError;
+        if (assignError) {
+          console.error('Errore assegnazione quest:', assignError);
+        }
 
-      const questsList = (questsData || []).map((q: Database['public']['Tables']['quest']['Row']) => ({
-        id: q.id,
-        giorno: q.giorno,
-        titolo: q.titolo,
-        descrizione: q.descrizione || '',
-        punti: q.punti,
-        difficolta: q.difficolta,
-        tipo_prova: q.tipo_prova as ('foto' | 'video' | 'testo')[],
-        emoji: q.emoji,
-        scadenza: q.scadenza || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      }));
+        // Carica le quest assegnate all'utente
+        const { data: userQuestsData, error: userQuestsError } = await supabase.rpc('get_user_quests', {
+          p_user_id: user.id,
+          p_giorno: giornoCorrente,
+        });
 
-      setQuests(questsList);
+        if (userQuestsError) {
+          console.error('Errore caricamento quest utente:', userQuestsError);
+          // Fallback: carica tutte le quest
+          const { data: questsData, error: questsError } = await supabase
+            .from('quest')
+            .select('*')
+            .eq('giorno', giornoCorrente)
+            .eq('attiva', true)
+            .order('punti', { ascending: false });
+
+          if (questsError) throw questsError;
+
+          const questsList = (questsData || []).map((q: Database['public']['Tables']['quest']['Row']) => ({
+            id: q.id,
+            giorno: q.giorno,
+            titolo: q.titolo,
+            descrizione: q.descrizione || '',
+            punti: q.punti,
+            difficolta: q.difficolta,
+            tipo_prova: q.tipo_prova as ('foto' | 'video' | 'testo')[],
+            emoji: q.emoji,
+            scadenza: q.scadenza || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          }));
+
+          setQuests(questsList);
+        } else {
+          // Mappa le quest assegnate al formato Quest
+          const questsList = (userQuestsData || []).map((q: any) => ({
+            id: q.quest_id,
+            giorno: giornoCorrente,
+            titolo: q.titolo,
+            descrizione: q.descrizione || '',
+            punti: q.punti,
+            difficolta: q.difficolta,
+            tipo_prova: q.tipo_prova as ('foto' | 'video' | 'testo')[],
+            emoji: q.emoji,
+            scadenza: q.scadenza || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          }));
+
+          setQuests(questsList);
+        }
+      } else {
+        // Se non c'è utente, carica tutte le quest (per preview/admin)
+        const { data: questsData, error: questsError } = await supabase
+          .from('quest')
+          .select('*')
+          .eq('giorno', giornoCorrente)
+          .eq('attiva', true)
+          .order('punti', { ascending: false });
+
+        if (questsError) throw questsError;
+
+        const questsList = (questsData || []).map((q: Database['public']['Tables']['quest']['Row']) => ({
+          id: q.id,
+          giorno: q.giorno,
+          titolo: q.titolo,
+          descrizione: q.descrizione || '',
+          punti: q.punti,
+          difficolta: q.difficolta,
+          tipo_prova: q.tipo_prova as ('foto' | 'video' | 'testo')[],
+          emoji: q.emoji,
+          scadenza: q.scadenza || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        }));
+
+        setQuests(questsList);
+      }
 
       // Carica gare
       const { data: gareData, error: gareError } = await supabase
@@ -170,9 +243,42 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
       if (gareError) throw gareError;
 
+      // Carica classifiche per tutte le gare completate
+      const gareIds = (gareData || []).map(g => g.id);
+      const classificheMap = new Map<string, any[]>();
+      
+      if (gareIds.length > 0) {
+        const { data: classificheData } = await supabase
+          .from('classifiche_gare')
+          .select('*')
+          .in('gara_id', gareIds)
+          .order('posizione', { ascending: true });
+
+        if (classificheData) {
+          classificheData.forEach((c: any) => {
+            if (!classificheMap.has(c.gara_id)) {
+              classificheMap.set(c.gara_id, []);
+            }
+            const squadra = squadreWithMembers.find(s => s.id === c.squadra_id);
+            classificheMap.get(c.gara_id)!.push({
+              squadra_id: c.squadra_id,
+              squadra_nome: squadra?.nome || '',
+              squadra_emoji: squadra?.emoji || '',
+              posizione: c.posizione,
+              punti_assegnati: c.punti_assegnati,
+            });
+          });
+        }
+      }
+
       const gareList = (gareData || []).map((g: Database['public']['Tables']['gare']['Row']) => {
         const squadraA = squadreWithMembers.find(s => s.id === g.squadra_a_id);
         const squadraB = squadreWithMembers.find(s => s.id === g.squadra_b_id);
+        const classifica = classificheMap.get(g.id) || undefined;
+        
+        // Determina tutte le squadre partecipanti (per ora solo A e B, ma può essere esteso)
+        const squadrePartecipanti = [squadraA, squadraB].filter(Boolean) as Squadra[];
+        
         return {
           id: g.id,
           nome: g.nome,
@@ -186,6 +292,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           orario: g.orario,
           giorno: g.giorno,
           stato: g.stato as 'programmata' | 'live' | 'completata',
+          classifica,
+          squadre_partecipanti: squadrePartecipanti,
         };
       });
 
@@ -677,6 +785,15 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
 
       if (error) throw error;
 
+      // Segna la quest come completata nell'assegnazione
+      const giornoCorrente = gameState.giorno_corrente;
+      await supabase
+        .from('user_quest_assignments')
+        .update({ completed_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('quest_id', questId)
+        .eq('giorno', giornoCorrente);
+
       // Aggiorna lo stato locale
       const provaData: any = data;
       const nuovaProva: ProvaQuest = {
@@ -750,6 +867,69 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       await loadData();
     } catch (error) {
       console.error('Errore assegnazione vincitore:', error);
+      throw error;
+    }
+  };
+
+  const assegnaClassifica = async (
+    garaId: string, 
+    classifiche: Array<{squadra_id: string, posizione: number}>
+  ) => {
+    if (!isSupabaseConfigured()) return;
+    
+    try {
+      // Converti le classifiche in formato JSONB
+      const classificheJsonb = classifiche.map(c => ({
+        squadra_id: c.squadra_id,
+        posizione: c.posizione,
+      }));
+
+      // Usa la funzione del database
+      const { error } = await supabase.rpc('assegna_classifica_gara', {
+        p_gara_id: garaId,
+        p_classifiche: classificheJsonb as any,
+      } as any);
+
+      if (error) throw error;
+
+      // Ricarica i dati
+      await loadData();
+    } catch (error) {
+      console.error('Errore assegnazione classifica:', error);
+      throw error;
+    }
+  };
+
+  const creaGara = async (gara: {
+    nome: string;
+    descrizione: string;
+    squadra_a_id: string;
+    squadra_b_id: string;
+    punti_in_palio: number;
+    orario: string;
+    giorno: number;
+  }) => {
+    if (!user || !user.is_admin || !isSupabaseConfigured()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('gare')
+        .insert({
+          nome: gara.nome,
+          descrizione: gara.descrizione,
+          squadra_a_id: gara.squadra_a_id,
+          squadra_b_id: gara.squadra_b_id,
+          punti_in_palio: gara.punti_in_palio,
+          orario: gara.orario,
+          giorno: gara.giorno,
+          stato: 'programmata',
+        } as any);
+
+      if (error) throw error;
+
+      await loadData();
+    } catch (error) {
+      console.error('Errore creazione gara:', error);
       throw error;
     }
   };
@@ -839,6 +1019,8 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     submitProva,
     votaProva,
     assegnaVincitore,
+    assegnaClassifica,
+    creaGara,
     aggiungiBonus,
     refreshData,
     mySquadra,

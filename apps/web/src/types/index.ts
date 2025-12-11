@@ -69,6 +69,14 @@ export interface ProvaQuest {
 // Gara (Team competition) types
 export type GaraStatus = 'programmata' | 'live' | 'completata';
 
+export interface ClassificaGara {
+  squadra_id: string;
+  squadra_nome: string;
+  squadra_emoji: string;
+  posizione: number;
+  punti_assegnati: number;
+}
+
 export interface Gara {
   id: string;
   nome: string;
@@ -82,6 +90,8 @@ export interface Gara {
   orario: string;
   giorno: number;
   stato: GaraStatus;
+  classifica?: ClassificaGara[]; // Classifica per gare multi-squadra
+  squadre_partecipanti?: Squadra[]; // Tutte le squadre partecipanti
 }
 
 // Leaderboard types
