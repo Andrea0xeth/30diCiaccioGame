@@ -553,27 +553,28 @@ export const SplashPage: React.FC = () => {
       >
         {/* DC-30 - Main Neon Text */}
         <div className="neon-3d-glow mb-4">
-          <h1 className="neon-red-orange neon-flicker text-6xl md:text-7xl font-display font-bold text-center tracking-wider">
+          <h1 className="neon-red-orange neon-flicker text-6xl md:text-7xl font-bold text-center tracking-wider">
             DC-30
           </h1>
         </div>
 
-        {/* Di Ciaccio - 30 - Small subtitle */}
+        {/* Di Ciaccio - 30 - Small subtitle - White with D and C uppercase */}
         <motion.p 
-          className="neon-red-orange text-sm md:text-base font-display font-medium text-center mb-6 tracking-wider lowercase"
+          className="neon-white text-sm md:text-base font-medium text-center mb-6 tracking-wider"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           style={{
+            WebkitTextStroke: '1.5px #ffffff',
             textShadow: `
-              0 0 3px #ff4444,
-              0 0 6px #ff4444,
-              0 0 9px #ff6b35,
-              0 0 12px #ff6b35
+              0 0 2px #ffffff,
+              0 0 4px #ffffff,
+              0 0 6px #ffffff,
+              0 0 8px #ffffff
             `
           }}
         >
-          di ciaccio - 30
+          <span className="uppercase">D</span>i <span className="uppercase">C</span>iaccio - 30
         </motion.p>
 
         {/* CIRCOLOCO Fuerteventura - White Neon */}
@@ -583,10 +584,10 @@ export const SplashPage: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          <h2 className="neon-white neon-flicker-white text-2xl md:text-3xl font-display font-bold text-center tracking-wider uppercase">
+          <h2 className="neon-white neon-flicker-white text-2xl md:text-3xl font-bold text-center tracking-wider uppercase">
             CIRCOLOCO
           </h2>
-          <p className="neon-white text-lg md:text-xl font-display font-semibold text-center tracking-wider uppercase mt-1">
+          <p className="neon-white text-lg md:text-xl font-semibold text-center tracking-wider uppercase mt-1">
             Fuerteventura
           </p>
         </motion.div>

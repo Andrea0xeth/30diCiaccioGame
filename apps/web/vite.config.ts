@@ -16,10 +16,10 @@ export default defineConfig({
     react(),
     basicSsl(), // Genera certificato SSL self-signed per sviluppo
     VitePWA({
-      // Usa 'autoUpdate' per aggiornamenti automatici in background
+      // Usa 'prompt' per permettere all'utente di scegliere quando aggiornare
       // Il nostro hook intercetterà quando c'è un nuovo SW in attesa
-      // e permetterà all'utente di aggiornare manualmente
-      registerType: 'autoUpdate',
+      // e mostrerà la notifica per permettere all'utente di aggiornare manualmente
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: '30diCiaccioGame',

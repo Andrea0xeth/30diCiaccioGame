@@ -73,11 +73,32 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
       }
     };
 
+    // Funzione per registrare o recuperare il service worker
+    const getRegistration = async (): Promise<ServiceWorkerRegistration> => {
+      // Prova prima a recuperare una registrazione esistente
+      if (navigator.serviceWorker.controller) {
+        const reg = await navigator.serviceWorker.ready;
+        return reg;
+      }
+      
+      // Se non c'è, registra il service worker
+      try {
+        const reg = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
+        });
+        return reg;
+      } catch (error) {
+        console.error('Error registering service worker:', error);
+        // Se la registrazione fallisce, prova comunque a recuperare ready
+        return await navigator.serviceWorker.ready;
+      }
+    };
+
     // Funzione per controllare se c'è un aggiornamento
     const checkForUpdate = async () => {
       try {
         // Registra o recupera il service worker
-        const reg = await navigator.serviceWorker.ready;
+        const reg = await getRegistration();
         registrationInstance = reg;
         setRegistration(reg);
 
