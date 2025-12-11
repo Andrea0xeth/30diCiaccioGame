@@ -455,6 +455,76 @@
     box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
   }
 
+  /* LED Outline per Immagini - Contorno super sottile con pseudo-elemento */
+  .led-outline-image-simple {
+    position: relative;
+    display: inline-block;
+    padding: 1px; /* Spazio per il contorno */
+  }
+
+  .led-outline-image-simple::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border: 1px solid #ff6b35;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: 
+      0 0 1px #ff6b35,
+      0 0 2px #ff6b35,
+      0 0 3px #ff4444,
+      0 0 4px #ff4444,
+      0 0 6px rgba(255, 68, 68, 0.6),
+      inset 0 0 1px rgba(255, 107, 53, 0.4),
+      inset 0 0 2px rgba(255, 68, 68, 0.2);
+    filter: 
+      drop-shadow(0 0 0.5px #ff6b35)
+      drop-shadow(0 0 1px #ff6b35)
+      drop-shadow(0 0 2px rgba(255, 68, 68, 0.5));
+    animation: led-outline-flicker 2.8s infinite;
+  }
+
+  .led-outline-image-simple img {
+    position: relative;
+    z-index: 0;
+    display: block;
+  }
+
+  @keyframes led-outline-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      border-color: #ff6b35;
+      box-shadow: 
+        0 0 1px #ff6b35,
+        0 0 2px #ff6b35,
+        0 0 3px #ff4444,
+        0 0 4px #ff4444,
+        0 0 6px rgba(255, 68, 68, 0.6),
+        inset 0 0 1px rgba(255, 107, 53, 0.4),
+        inset 0 0 2px rgba(255, 68, 68, 0.2);
+      filter: 
+        drop-shadow(0 0 0.5px #ff6b35)
+        drop-shadow(0 0 1px #ff6b35)
+        drop-shadow(0 0 2px rgba(255, 68, 68, 0.5));
+      opacity: 1;
+    }
+    20%, 24%, 55% {
+      border-color: #ff4444;
+      box-shadow: 
+        0 0 0.5px #ff4444,
+        0 0 1px rgba(255, 68, 68, 0.5),
+        0 0 2px rgba(255, 68, 68, 0.3),
+        inset 0 0 0.5px rgba(255, 68, 68, 0.2);
+      filter: 
+        drop-shadow(0 0 0.3px rgba(255, 68, 68, 0.4))
+        drop-shadow(0 0 0.8px rgba(255, 68, 68, 0.3));
+      opacity: 0.7;
+    }
+  }
+
   /* LED Outline Effect - Solo contorni illuminati come nell'immagine */
   .neon-red-orange {
     font-family: 'Kalam', 'Caveat', cursive;
