@@ -223,9 +223,7 @@ export const AdminPage: React.FC = () => {
                         selectedUser === utente.id ? 'border-coral-500' : ''
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-white font-bold">
-                        {utente.nickname.charAt(0).toUpperCase()}
-                      </div>
+                      <Avatar user={utente} size="md" />
                       <div className="flex-1">
                         <span className="font-semibold">{utente.nickname}</span>
                         <p className="text-xs text-gray-500">{utente.punti_personali} pts</p>

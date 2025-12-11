@@ -6,6 +6,7 @@ import { QuestCard } from '../components/QuestCard';
 import { VerificaCard } from '../components/VerificaCard';
 import { GaraCard } from '../components/GaraCard';
 import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
+import { Avatar } from '../components/Avatar';
 
 export const HomePage: React.FC = () => {
   const { 
@@ -38,9 +39,9 @@ export const HomePage: React.FC = () => {
             <motion.button 
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowProfile(true)}
-              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-white font-bold text-sm"
+              className="rounded-2xl overflow-hidden"
             >
-              {user?.nickname?.charAt(0).toUpperCase() || 'G'}
+              <Avatar user={user} size="md" />
             </motion.button>
             <div>
               <h1 className="font-display font-bold text-base text-gradient leading-tight">30diCiaccioGame</h1>
@@ -223,8 +224,8 @@ export const HomePage: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-2xl font-bold text-white mx-auto mb-3">
-                  {user?.nickname?.charAt(0).toUpperCase() || 'G'}
+                <div className="mx-auto mb-3">
+                  <Avatar user={user} size="lg" />
                 </div>
                 <h2 className="font-bold text-lg">{user?.nickname || 'Giocatore'}</h2>
                 <p className="text-gray-500 text-sm">Membro di {mySquadra?.nome}</p>

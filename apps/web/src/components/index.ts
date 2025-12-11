@@ -5,5 +5,6 @@ export { VerificaCard } from './VerificaCard';
 export { Countdown } from './Countdown';
 export { GaraCard } from './GaraCard';
 export { PWAInstallPrompt } from './PWAInstallPrompt';
+export { Avatar } from './Avatar';
 export { UpdateNotification } from './UpdateNotification';
 export { CircusNeonDecorations, FloatingCircusDecorations } from './CircusNeonDecorations';

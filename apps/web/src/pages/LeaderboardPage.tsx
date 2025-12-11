@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Users, User, TrendingUp, TrendingDown, Minus, Crown, Flame } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
+import { Avatar } from '../components/Avatar';
 
 type TabType = 'squadre' | 'singoli';
 
@@ -233,9 +234,7 @@ export const LeaderboardPage: React.FC = () => {
                     }`}
                   >
                     <PositionBadge position={index + 1} />
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                      {giocatore.nickname.charAt(0).toUpperCase()}
-                    </div>
+                    <Avatar user={giocatore} size="sm" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold truncate text-sm">{giocatore.nickname}</span>

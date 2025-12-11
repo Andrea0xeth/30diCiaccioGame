@@ -4,18 +4,27 @@ import { Users, Trophy, Flame, Crown, Swords } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { GaraCard } from '../components/GaraCard';
 import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
+import { Avatar } from '../components/Avatar';
 
 export const SquadraPage: React.FC = () => {
   const { user, mySquadra, gare, leaderboardSquadre } = useGame();
 
-  // Mock team members
-  const mockMembers = [
-    { id: '1', nickname: 'Pippo', punti: 85, isMVP: true },
-    { id: '2', nickname: 'Pluto', punti: 62, isMVP: false },
-    { id: '3', nickname: 'Paperino', punti: 54, isMVP: false },
-    { id: '4', nickname: 'Topolino', punti: 48, isMVP: false },
-    { id: user?.id || '5', nickname: user?.nickname || 'Tu', punti: user?.punti_personali || 0, isMVP: false },
-  ].sort((a, b) => b.punti - a.punti);
+  // Usa i membri reali della squadra se disponibili, altrimenti mock
+  const teamMembers = mySquadra?.membri && mySquadra.membri.length > 0
+    ? mySquadra.membri.map(m => ({
+        id: m.id,
+        nickname: m.nickname,
+        punti: m.punti_personali,
+        isMVP: false,
+        avatar: m.avatar,
+      })).sort((a, b) => b.punti - a.punti)
+    : [
+        { id: '1', nickname: 'Pippo', punti: 85, isMVP: true },
+        { id: '2', nickname: 'Pluto', punti: 62, isMVP: false },
+        { id: '3', nickname: 'Paperino', punti: 54, isMVP: false },
+        { id: '4', nickname: 'Topolino', punti: 48, isMVP: false },
+        { id: user?.id || '5', nickname: user?.nickname || 'Tu', punti: user?.punti_personali || 0, isMVP: false },
+      ].sort((a, b) => b.punti - a.punti);
 
   const myPosition = leaderboardSquadre.findIndex(s => s.id === mySquadra?.id) + 1;
   
@@ -85,7 +94,7 @@ export const SquadraPage: React.FC = () => {
           </h2>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
-              <div className="text-lg font-bold text-coral-500">{mockMembers.length}</div>
+              <div className="text-lg font-bold text-coral-500">{teamMembers.length}</div>
               <div className="text-[10px] text-gray-500">Membri</div>
             </div>
             <div>
@@ -96,7 +105,7 @@ export const SquadraPage: React.FC = () => {
             </div>
             <div>
               <div className="text-lg font-bold text-party-300">
-                {Math.round(mockMembers.reduce((acc, m) => acc + m.punti, 0) / mockMembers.length)}
+                {Math.round(teamMembers.reduce((acc, m) => acc + m.punti, 0) / teamMembers.length)}
               </div>
               <div className="text-[10px] text-gray-500">Media Pts</div>
             </div>
@@ -111,7 +120,7 @@ export const SquadraPage: React.FC = () => {
           </h2>
           
           <div className="space-y-2">
-            {mockMembers.map((member, index) => (
+            {teamMembers.map((member, index) => (
               <motion.div
                 key={member.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -124,9 +133,10 @@ export const SquadraPage: React.FC = () => {
                 <div className="w-5 text-center font-bold text-gray-500 text-xs flex-shrink-0">
                   {index + 1}
                 </div>
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  {member.nickname.charAt(0).toUpperCase()}
-                </div>
+                <Avatar 
+                  user={member.avatar ? { nickname: member.nickname, avatar: member.avatar } : { nickname: member.nickname }} 
+                  size="md" 
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold text-sm truncate">{member.nickname}</span>

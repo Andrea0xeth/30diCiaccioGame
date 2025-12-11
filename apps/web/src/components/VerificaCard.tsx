@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, X, Image, Video, FileText, Clock } from 'lucide-react';
 import type { ProvaQuest } from '../types';
+import { Avatar } from './Avatar';
 
 interface VerificaCardProps {
   prova: ProvaQuest;
@@ -38,9 +39,7 @@ export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => 
     >
       {/* Header - Compact */}
       <div className="flex items-center gap-2 mb-2">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-coral-500 to-turquoise-400 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-          {prova.user.nickname.charAt(0).toUpperCase()}
-        </div>
+        <Avatar user={prova.user} size="md" />
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-sm truncate">{prova.user.nickname}</h4>
           <div className="flex items-center gap-1.5 text-[10px] text-gray-500">
