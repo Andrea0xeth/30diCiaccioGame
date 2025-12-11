@@ -53,32 +53,56 @@ export const SplashPage: React.FC = () => {
   // Redirect solo se già autenticato ALL'AVVIO (non dopo login/registrazione)
   // Non fare redirect se stiamo mostrando il video post-benvenuto
   useEffect(() => {
-    if (isAuthenticated && viewState === 'splash' && !showPostVideo) {
+    // Non fare redirect se:
+    // 1. Stiamo mostrando il video post
+    // 2. Siamo già nella schermata video-post
+    // 3. Stiamo caricando l'autenticazione
+    if (isAuthenticated && viewState === 'splash' && !showPostVideo && !authLoading) {
       // Se già autenticato all'avvio, vai direttamente alla home
       // Ma NON fare redirect se stiamo per mostrare il video post-benvenuto
       navigate('/home', { replace: true });
     }
-  }, [isAuthenticated, navigate, viewState, showPostVideo]);
+  }, [isAuthenticated, navigate, viewState, showPostVideo, authLoading]);
 
   // Gestisci il video quando cambia viewState
   useEffect(() => {
     if ((viewState === 'video-pre' || viewState === 'video-post') && videoRef.current) {
       const video = videoRef.current;
       video.currentTime = 0;
-      // Forza il play del video con volume
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Se il play riesce, assicurati che il volume sia al massimo
-            video.volume = 1;
-          })
-          .catch(error => {
-            console.error('Error playing video:', error);
-            // Se l'autoplay fallisce (perché richiede interazione utente),
-            // mostra un messaggio o un bottone per far partire il video
-          });
+      video.volume = 1;
+      
+      // Assicurati che il video sia caricato prima di farlo partire
+      const handleCanPlay = () => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log('Video avviato con successo');
+            })
+            .catch(error => {
+              console.error('Error playing video:', error);
+              // Se l'autoplay fallisce, mostra il bottone continua
+              if (viewState === 'video-post') {
+                setShowPostContinueButton(true);
+              } else {
+                setShowContinueButton(true);
+              }
+            });
+        }
+      };
+      
+      // Se il video è già caricato, fai partire subito
+      if (video.readyState >= 3) { // HAVE_FUTURE_DATA o superiore
+        handleCanPlay();
+      } else {
+        // Altrimenti aspetta che sia caricato
+        video.addEventListener('canplay', handleCanPlay, { once: true });
+        video.load(); // Forza il caricamento
       }
+      
+      return () => {
+        video.removeEventListener('canplay', handleCanPlay);
+      };
     }
   }, [viewState]);
 
@@ -97,14 +121,23 @@ export const SplashPage: React.FC = () => {
       // After successful login, show post-login video
       // Il video post-benvenuto viene mostrato nello stesso componente con gli stessi bottoni
       setAuthLoading(false);
+      
+      // Cambia lo stato PRIMA di provare a far partire il video
       setViewState('video-post');
-      // Reset video when changing to video state
+      
+      // Usa un timeout più lungo e assicurati che il video sia caricato
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.currentTime = 0;
-          videoRef.current.play().catch(console.error);
+          // Forza il caricamento del video prima di farlo partire
+          videoRef.current.load();
+          videoRef.current.play().catch((err) => {
+            console.error('Errore nel play del video post-iscrizione:', err);
+            // Se il play fallisce, mostra comunque il bottone continua
+            setShowPostContinueButton(true);
+          });
         }
-      }, 100);
+      }, 200);
     } catch (error) {
       console.error('Login failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Errore durante il login. Registrati se non hai ancora un account.';
@@ -162,14 +195,23 @@ export const SplashPage: React.FC = () => {
       // After successful registration, show post-registration video
       // Il video post-benvenuto viene mostrato nello stesso componente con gli stessi bottoni
       setAuthLoading(false);
+      
+      // Cambia lo stato PRIMA di provare a far partire il video
       setViewState('video-post');
-      // Reset video when changing to video state
+      
+      // Usa un timeout più lungo e assicurati che il video sia caricato
       setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.currentTime = 0;
-          videoRef.current.play().catch(console.error);
+          // Forza il caricamento del video prima di farlo partire
+          videoRef.current.load();
+          videoRef.current.play().catch((err) => {
+            console.error('Errore nel play del video post-iscrizione:', err);
+            // Se il play fallisce, mostra comunque il bottone continua
+            setShowPostContinueButton(true);
+          });
         }
-      }, 100);
+      }, 200);
     } catch (error) {
       console.error('Registration failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Errore durante la registrazione';
@@ -275,7 +317,8 @@ export const SplashPage: React.FC = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={handleContinueFromPreVideo}
-                  className="btn-primary px-6 py-3 rounded-2xl font-semibold text-white shadow-xl"
+                  className="btn-primary px-6 py-3 rounded-2xl font-semibold text-white shadow-xl active:scale-95 transition-transform duration-75"
+                  transition={{ duration: 0.1 }}
                 >
                   CONTINUA
                 </motion.button>
@@ -339,7 +382,8 @@ export const SplashPage: React.FC = () => {
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={handleContinueFromPostVideo}
-                  className="btn-primary px-6 py-3 rounded-2xl font-semibold text-white shadow-xl"
+                  className="btn-primary px-6 py-3 rounded-2xl font-semibold text-white shadow-xl active:scale-95 transition-transform duration-75"
+                  transition={{ duration: 0.1 }}
                 >
                   CONTINUA
                 </motion.button>
@@ -426,7 +470,7 @@ export const SplashPage: React.FC = () => {
           <button
             onClick={handleAuth}
             disabled={authLoading || !registrationData.nome || !registrationData.cognome || !registrationData.email}
-            className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2 active:scale-95 transition-transform duration-75"
           >
             {authLoading ? (
               <motion.div
@@ -549,9 +593,10 @@ export const SplashPage: React.FC = () => {
             <motion.button
               key="enter"
               onClick={handleEnterGame}
-              className="btn-primary w-full flex items-center justify-center gap-2 text-base py-3"
-              whileTap={{ scale: 0.98 }}
+              className="btn-primary w-full flex items-center justify-center gap-2 text-base py-3 active:scale-95 transition-transform duration-75"
+              whileTap={{ scale: 0.95 }}
               exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.1 }}
             >
               <Fingerprint size={20} />
               Entra nel Game
@@ -580,7 +625,7 @@ export const SplashPage: React.FC = () => {
               <button
                 onClick={handleLogin}
                 disabled={authLoading}
-                className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform duration-75"
               >
                 {authLoading ? (
                   <motion.div
@@ -599,7 +644,7 @@ export const SplashPage: React.FC = () => {
               <button
                 onClick={handleRegister}
                 disabled={authLoading}
-                className="btn-secondary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-secondary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform duration-75"
               >
                 <Sparkles size={18} />
                 Registrati (Nuovo Account)
