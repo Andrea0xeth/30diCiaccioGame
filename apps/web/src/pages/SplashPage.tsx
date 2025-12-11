@@ -6,6 +6,7 @@ import { useGame } from '../context/GameContext';
 import { Countdown } from '../components/Countdown';
 import { PWAInstallPrompt } from '../components/PWAInstallPrompt';
 import { WebAuthnDebug } from '../components/WebAuthnDebug';
+import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 import type { RegistrationData } from '../types';
 
 type ViewState = 'splash' | 'video-pre' | 'auth' | 'auth-choice' | 'video-post' | 'loading';
@@ -519,29 +520,46 @@ export const SplashPage: React.FC = () => {
 
   return (
     <div className="h-screen bg-dark flex flex-col items-center justify-center p-4 pt-safe overflow-hidden relative">
-      {/* Background particles - Reduced */}
+      {/* Background - Falling Circus Neon Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1.5 h-1.5 rounded-full"
-            style={{
-              background: ['#FF6B6B', '#4ECDC4', '#FFE66D'][i % 3],
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [-15, 15],
-              opacity: [0.2, 0.5, 0.2],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        {[...Array(8)].map((_, i) => {
+          const variants: Array<'clown-face' | 'star' | 'balloon' | 'confetti'> = ['clown-face', 'star', 'balloon', 'confetti'];
+          const colors: Array<'red' | 'white' | 'orange'> = ['red', 'white', 'orange'];
+          const variant = variants[i % variants.length];
+          const color = colors[i % colors.length];
+          const startX = Math.random() * 100;
+          const fallDuration = 4 + Math.random() * 3;
+          const delay = Math.random() * 2;
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${startX}%`,
+                top: '-10%',
+              }}
+              animate={{
+                y: ['0vh', '110vh'],
+                opacity: [0, 0.6, 0.6, 0],
+                rotate: [0, 180, 360],
+                scale: [0.8, 1, 0.8],
+              }}
+              transition={{
+                duration: fallDuration,
+                repeat: Infinity,
+                delay: delay,
+                ease: 'linear',
+              }}
+            >
+              <CircusNeonDecorations
+                variant={variant}
+                size="small"
+                color={color}
+              />
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Neon Logo & Title Section */}
@@ -565,29 +583,29 @@ export const SplashPage: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           style={{
-            WebkitTextStroke: '0.5px #ffffff',
+            WebkitTextStroke: '0.3px #ffffff',
             textShadow: `
-              0 0 0.5px #ffffff,
-              0 0 1px #ffffff,
-              0 0 1.5px #ffffff,
-              0 0 2px #ffffff
+              0 0 0.3px #ffffff,
+              0 0 0.6px #ffffff,
+              0 0 0.9px #ffffff,
+              0 0 1.2px #ffffff
             `
           }}
         >
           <span className="uppercase">D</span>i <span className="uppercase">C</span>iaccio - 30
         </motion.p>
 
-        {/* CIRCOLOCO Fuerteventura - White Neon */}
+        {/* CIRCOLOCO Fuerteventura - White Neon - Larger */}
         <motion.div 
           className="neon-3d-glow-white mb-4"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          <h2 className="neon-white neon-flicker-white text-2xl md:text-3xl font-bold text-center tracking-wider uppercase">
+          <h2 className="neon-white neon-flicker-white text-4xl md:text-5xl font-bold text-center tracking-wider uppercase">
             CIRCOLOCO
           </h2>
-          <p className="neon-white text-lg md:text-xl font-semibold text-center tracking-wider uppercase mt-1">
+          <p className="neon-white text-xl md:text-2xl font-semibold text-center tracking-wider uppercase mt-1">
             Fuerteventura
           </p>
         </motion.div>
@@ -694,7 +712,7 @@ export const SplashPage: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        © 2024 30diCiaccioGame - Buon Compleanno! 🎂
+        DC-30 Fuerteventura - 🎂 © 2026
       </motion.p>
     </div>
   );
