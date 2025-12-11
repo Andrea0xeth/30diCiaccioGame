@@ -603,7 +603,7 @@ export const SplashPage: React.FC = () => {
           transition={{ delay: 0.5, duration: 0.6 }}
         >
           <h2 className="neon-white neon-flicker-white text-4xl md:text-5xl font-bold text-center tracking-wider uppercase">
-            CIRCOLOCO
+            CIRCOCIACCIO
           </h2>
           <p className="neon-white text-xl md:text-2xl font-semibold text-center tracking-wider uppercase mt-1">
             Fuerteventura
