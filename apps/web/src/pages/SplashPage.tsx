@@ -28,6 +28,7 @@ export const SplashPage: React.FC = () => {
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [showPostContinueButton, setShowPostContinueButton] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isShowingPostVideoRef = useRef(false); // Ref per tracciare se stiamo mostrando il video post (previene race conditions)
 
   // Target date for the event: 8 gennaio 2026 alle 00:00 CET
   // CET = Central European Time (UTC+1 in inverno, UTC+2 in estate)
@@ -51,14 +52,23 @@ export const SplashPage: React.FC = () => {
   }, [viewState]);
 
   // Redirect solo se già autenticato ALL'AVVIO (non dopo login/registrazione)
-  // Non fare redirect se stiamo mostrando il video post-benvenuto
+  // Non fare redirect se stiamo mostrando il video post-benvenuto o siamo in processo di autenticazione
   useEffect(() => {
-    if (isAuthenticated && viewState === 'splash' && !showPostVideo) {
+    // NON fare redirect se:
+    // 1. Stiamo mostrando il video post-benvenuto (showPostVideo === true o isShowingPostVideoRef.current === true) - questo previene redirect dopo login/registrazione
+    // 2. Siamo già nella schermata del video post (viewState === 'video-post')
+    // 3. Siamo nella schermata di autenticazione o scelta (viewState === 'auth' || 'auth-choice')
+    // 4. Stiamo caricando l'autenticazione (authLoading === true)
+    if (isAuthenticated && 
+        viewState === 'splash' && 
+        !showPostVideo &&
+        !isShowingPostVideoRef.current &&
+        !authLoading) {
       // Se già autenticato all'avvio, vai direttamente alla home
-      // Ma NON fare redirect se stiamo per mostrare il video post-benvenuto
+      // Ma NON fare redirect se stiamo per mostrare il video post-benvenuto o siamo in processo di autenticazione
       navigate('/home', { replace: true });
     }
-  }, [isAuthenticated, navigate, viewState, showPostVideo]);
+  }, [isAuthenticated, navigate, viewState, showPostVideo, authLoading]);
 
   // Gestisci il video quando cambia viewState
   useEffect(() => {
@@ -91,10 +101,12 @@ export const SplashPage: React.FC = () => {
   const handleLogin = async () => {
     setAuthLoading(true);
     setShowPostVideo(true); // Imposta il flag PRIMA del login per prevenire redirect automatico
+    isShowingPostVideoRef.current = true; // Imposta anche il ref per prevenire race conditions
     setShowPostContinueButton(false); // Reset continue button state
     try {
       await loginWithPasskey();
-      // After successful login, show post-login video
+      // After successful login, show post-login video IMMEDIATELY
+      // Cambia viewState PRIMA che React possa processare il cambio di isAuthenticated
       // Il video post-benvenuto viene mostrato nello stesso componente con gli stessi bottoni
       setViewState('video-post');
       setAuthLoading(false);
@@ -116,7 +128,10 @@ export const SplashPage: React.FC = () => {
         alert(errorMessage);
       }
       setShowPostVideo(false);
+      isShowingPostVideoRef.current = false; // Reset anche il ref
       setAuthLoading(false);
+      // Torna alla schermata di scelta se il login fallisce
+      setViewState('auth-choice');
     }
   };
 
@@ -153,6 +168,7 @@ export const SplashPage: React.FC = () => {
 
     setAuthLoading(true);
     setShowPostVideo(true); // Imposta il flag PRIMA della registrazione per prevenire redirect automatico
+    isShowingPostVideoRef.current = true; // Imposta anche il ref per prevenire race conditions
     
     try {
       // Chiama direttamente register() per creare un nuovo account con nuova passkey
@@ -181,6 +197,7 @@ export const SplashPage: React.FC = () => {
         alert(errorMessage);
       }
       setShowPostVideo(false);
+      isShowingPostVideoRef.current = false; // Reset anche il ref
       setAuthLoading(false);
     }
   };
@@ -197,6 +214,8 @@ export const SplashPage: React.FC = () => {
   
   const handleContinueFromPostVideo = () => {
     setShowPostContinueButton(false);
+    setShowPostVideo(false);
+    isShowingPostVideoRef.current = false; // Reset anche il ref quando si continua
     navigate('/home', { replace: true });
   };
 
@@ -207,6 +226,8 @@ export const SplashPage: React.FC = () => {
       setViewState('auth');
     } else if (viewState === 'video-post') {
       setShowPostContinueButton(false);
+      setShowPostVideo(false);
+      isShowingPostVideoRef.current = false; // Reset anche il ref quando si salta
       navigate('/home', { replace: true });
     }
   };
