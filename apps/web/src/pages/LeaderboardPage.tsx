@@ -55,7 +55,7 @@ export const LeaderboardPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full bg-dark flex flex-col overflow-hidden">
+    <div className="min-h-full bg-dark flex flex-col">
       {/* Header - Fixed, compact */}
       <div className="flex-shrink-0 glass-strong px-3 pt-safe pb-2">
         <motion.div 
@@ -95,8 +95,8 @@ export const LeaderboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-3 py-2">
+      {/* Content - Scrollable, passes under navbar */}
+      <div className="flex-1 px-3 py-2 pb-24">
         <AnimatePresence mode="wait">
           {activeTab === 'squadre' ? (
             <motion.div

@@ -93,7 +93,7 @@ export const PremiPage: React.FC = () => {
   const totalPoints = Math.round(userPoints * 0.7 + teamPoints * 0.3);
 
   return (
-    <div className="h-full bg-dark flex flex-col overflow-hidden">
+    <div className="min-h-full bg-dark flex flex-col">
       {/* Header - Fixed, compact */}
       <div className="flex-shrink-0 glass-strong px-3 pt-safe pb-2">
         <motion.div 
@@ -125,8 +125,8 @@ export const PremiPage: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-3 py-2 space-y-3">
+      {/* Content - Scrollable, passes under navbar */}
+      <div className="flex-1 px-3 py-2 pb-24 space-y-3">
         {/* Categories */}
         {(['squadra', 'singolo', 'giornaliero', 'speciale'] as const).map((tipo) => {
           const premi = mockPremi.filter(p => p.tipo === tipo);

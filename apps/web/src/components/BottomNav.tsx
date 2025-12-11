@@ -43,7 +43,7 @@ export const BottomNav: React.FC = () => {
 
   return (
     <nav className="bottom-nav">
-      <div className="flex items-center justify-around py-2">
+      <div className="flex items-center justify-around py-1">
         <NavItem 
           to="/home" 
           icon={<Home size={22} />} 

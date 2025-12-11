@@ -559,6 +559,16 @@ export const SplashPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-3 w-full"
             >
+              {(!window.isSecureContext && 
+                window.location.hostname !== 'localhost' && 
+                window.location.hostname !== '127.0.0.1') && (
+                <div className="glass border border-yellow-500/50 rounded-xl p-3 mb-3">
+                  <p className="text-xs text-yellow-400 text-center">
+                    ⚠️ Per usare Face ID/Touch ID, accedi tramite HTTPS o localhost
+                  </p>
+                </div>
+              )}
+              
               <p className="text-sm text-gray-400 text-center mb-4">
                 Hai già un account o vuoi registrarti?
               </p>
