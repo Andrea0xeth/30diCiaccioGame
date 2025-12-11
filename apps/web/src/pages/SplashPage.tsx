@@ -579,7 +579,7 @@ export const SplashPage: React.FC = () => {
       >
         {/* Di Ciaccio - 30 - Small subtitle - White with D and C uppercase - Less visible - Above DC-30 */}
         <motion.p 
-          className="text-sm md:text-base font-medium text-center mb-2 tracking-wider"
+          className="text-sm md:text-base font-medium text-center mb-1 tracking-wider"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.5 }}
           transition={{ delay: 0.2 }}
@@ -598,23 +598,8 @@ export const SplashPage: React.FC = () => {
 
         {/* DC-30 with Overlay Image */}
         <div className="relative flex flex-col items-center">
-          {/* DC-10 Plane Image - Below DC-30 */}
-          <motion.div
-            className="absolute top-12 md:top-16 z-10 flex justify-center"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <img 
-              src="/dc10plane.png" 
-              alt="DC-10 Plane" 
-              className="max-w-[120px] md:max-w-[150px]"
-              style={{ maxHeight: '100px', objectFit: 'contain', display: 'block' }}
-            />
-          </motion.div>
-
-          {/* DC-30 - Main Neon Text - Above the image */}
-          <div className="neon-3d-glow mb-0 relative z-20">
+          {/* DC-30 - Main Neon Text - Appena sotto Di Ciaccio - 30 */}
+          <div className="neon-3d-glow mb-0 relative z-10">
             <h1 
               className="neon-red-orange text-6xl md:text-7xl font-bold text-center tracking-wider"
               style={{
@@ -624,6 +609,21 @@ export const SplashPage: React.FC = () => {
               DC-30
             </h1>
           </div>
+
+          {/* DC-10 Plane Image - Overlay on DC-30 - Larger and higher z-index */}
+          <motion.div
+            className="absolute top-12 md:top-16 z-30 flex justify-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <img 
+              src="/dc10plane.png" 
+              alt="DC-10 Plane" 
+              className="max-w-[180px] md:max-w-[220px]"
+              style={{ maxHeight: '150px', objectFit: 'contain', display: 'block' }}
+            />
+          </motion.div>
         </div>
 
         {/* CIRCOLOCO Fuerteventura - White Neon - Larger */}
