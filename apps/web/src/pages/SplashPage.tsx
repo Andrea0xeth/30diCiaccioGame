@@ -570,7 +570,7 @@ export const SplashPage: React.FC = () => {
         transition={{ duration: 0.4 }}
       >
         {/* DC-30 - Main Neon Text */}
-        <div className="neon-3d-glow mb-4">
+        <div className="neon-3d-glow mb-0">
           <h1 className="neon-red-orange neon-flicker text-6xl md:text-7xl font-bold text-center tracking-wider">
             DC-30
           </h1>
@@ -578,7 +578,7 @@ export const SplashPage: React.FC = () => {
 
         {/* Di Ciaccio - 30 - Small subtitle - White with D and C uppercase */}
         <motion.p 
-          className="neon-white text-sm md:text-base font-medium text-center mb-6 tracking-wider"
+          className="neon-white text-sm md:text-base font-medium text-center mb-6 tracking-wider -mt-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
