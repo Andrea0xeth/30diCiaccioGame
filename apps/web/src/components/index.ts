@@ -5,3 +5,4 @@ export { VerificaCard } from './VerificaCard';
 export { Countdown } from './Countdown';
 export { GaraCard } from './GaraCard';
 export { PWAInstallPrompt } from './PWAInstallPrompt';
+export { UpdateNotification } from './UpdateNotification';

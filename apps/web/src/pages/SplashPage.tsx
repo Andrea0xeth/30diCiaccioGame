@@ -96,8 +96,8 @@ export const SplashPage: React.FC = () => {
       await loginWithPasskey();
       // After successful login, show post-login video
       // Il video post-benvenuto viene mostrato nello stesso componente con gli stessi bottoni
-      setViewState('video-post');
       setAuthLoading(false);
+      setViewState('video-post');
       // Reset video when changing to video state
       setTimeout(() => {
         if (videoRef.current) {
@@ -153,6 +153,7 @@ export const SplashPage: React.FC = () => {
 
     setAuthLoading(true);
     setShowPostVideo(true); // Imposta il flag PRIMA della registrazione per prevenire redirect automatico
+    setShowPostContinueButton(false); // Reset continue button state
     
     try {
       // Chiama direttamente register() per creare un nuovo account con nuova passkey
@@ -160,9 +161,8 @@ export const SplashPage: React.FC = () => {
       await register(registrationData);
       // After successful registration, show post-registration video
       // Il video post-benvenuto viene mostrato nello stesso componente con gli stessi bottoni
-      setShowPostContinueButton(false); // Reset continue button state
-      setViewState('video-post');
       setAuthLoading(false);
+      setViewState('video-post');
       // Reset video when changing to video state
       setTimeout(() => {
         if (videoRef.current) {

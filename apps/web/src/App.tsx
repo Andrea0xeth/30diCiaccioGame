@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { GameProvider, useGame } from './context/GameContext';
 import { Layout } from './components/Layout';
+import { UpdateNotification } from './components/UpdateNotification';
 import { SplashPage } from './pages/SplashPage';
 import { HomePage } from './pages/HomePage';
 import { SquadraPage } from './pages/SquadraPage';
@@ -62,6 +63,7 @@ function App() {
     <GameProvider>
       <Router>
         <AppRoutes />
+        <UpdateNotification />
       </Router>
     </GameProvider>
   );
