@@ -455,17 +455,17 @@
     box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
   }
 
-  /* Neon Text Effects - Very thin, defined letters */
+  /* Neon Text Effects - Thin, defined letters */
   .neon-red-orange {
     font-family: 'Kalam', 'Caveat', cursive;
     color: #ff4444;
-    -webkit-text-stroke: 0.4px #ff0000;
+    -webkit-text-stroke: 0.6px #ff0000;
     text-shadow:
-      0 0 0.5px #ff0000,
       0 0 1px #ff0000,
-      0 0 1.5px #ff4444,
-      0 0 2px #ff6b35;
-    font-weight: 500;
+      0 0 2px #ff0000,
+      0 0 3px #ff4444,
+      0 0 4px #ff6b35;
+    font-weight: 600;
     letter-spacing: 0.05em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -474,13 +474,13 @@
   .neon-white {
     font-family: 'Kalam', 'Caveat', cursive;
     color: #ffffff;
-    -webkit-text-stroke: 0.4px #ffffff;
+    -webkit-text-stroke: 0.6px #ffffff;
     text-shadow:
-      0 0 0.5px #ffffff,
       0 0 1px #ffffff,
-      0 0 1.5px #ffffff,
-      0 0 2px #ffffff;
-    font-weight: 500;
+      0 0 2px #ffffff,
+      0 0 3px #ffffff,
+      0 0 4px #ffffff;
+    font-weight: 600;
     letter-spacing: 0.03em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -490,62 +490,62 @@
   @keyframes neon-flicker {
     0%, 100% {
       text-shadow:
-        0 0 0.5px #ff0000,
         0 0 1px #ff0000,
-        0 0 1.5px #ff4444,
-        0 0 2px #ff6b35;
+        0 0 2px #ff0000,
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     18% {
       text-shadow:
-        0 0 0.2px #ff0000;
+        0 0 0.3px #ff0000;
       opacity: 0.4;
     }
     19% {
       text-shadow:
-        0 0 0.5px #ff0000,
         0 0 1px #ff0000,
-        0 0 1.5px #ff4444,
-        0 0 2px #ff6b35;
+        0 0 2px #ff0000,
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     38% {
       text-shadow:
-        0 0 0.2px #ff0000;
+        0 0 0.3px #ff0000;
       opacity: 0.5;
     }
     39% {
       text-shadow:
-        0 0 0.5px #ff0000,
         0 0 1px #ff0000,
-        0 0 1.5px #ff4444,
-        0 0 2px #ff6b35;
+        0 0 2px #ff0000,
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     58% {
       text-shadow:
-        0 0 0.2px #ff0000;
+        0 0 0.3px #ff0000;
       opacity: 0.3;
     }
     59% {
       text-shadow:
-        0 0 0.5px #ff0000,
         0 0 1px #ff0000,
-        0 0 1.5px #ff4444,
-        0 0 2px #ff6b35;
+        0 0 2px #ff0000,
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     78% {
       text-shadow:
-        0 0 0.2px #ff0000;
+        0 0 0.3px #ff0000;
       opacity: 0.45;
     }
     79% {
       text-shadow:
-        0 0 0.5px #ff0000,
         0 0 1px #ff0000,
-        0 0 1.5px #ff4444,
-        0 0 2px #ff6b35;
+        0 0 2px #ff0000,
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
   }
@@ -553,62 +553,62 @@
   @keyframes neon-flicker-white {
     0%, 100% {
       text-shadow:
-        0 0 0.5px #ffffff,
         0 0 1px #ffffff,
-        0 0 1.5px #ffffff,
-        0 0 2px #ffffff;
+        0 0 2px #ffffff,
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     18% {
       text-shadow:
-        0 0 0.2px #ffffff;
+        0 0 0.3px #ffffff;
       opacity: 0.4;
     }
     19% {
       text-shadow:
-        0 0 0.5px #ffffff,
         0 0 1px #ffffff,
-        0 0 1.5px #ffffff,
-        0 0 2px #ffffff;
+        0 0 2px #ffffff,
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     38% {
       text-shadow:
-        0 0 0.2px #ffffff;
+        0 0 0.3px #ffffff;
       opacity: 0.5;
     }
     39% {
       text-shadow:
-        0 0 0.5px #ffffff,
         0 0 1px #ffffff,
-        0 0 1.5px #ffffff,
-        0 0 2px #ffffff;
+        0 0 2px #ffffff,
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     58% {
       text-shadow:
-        0 0 0.2px #ffffff;
+        0 0 0.3px #ffffff;
       opacity: 0.3;
     }
     59% {
       text-shadow:
-        0 0 0.5px #ffffff,
         0 0 1px #ffffff,
-        0 0 1.5px #ffffff,
-        0 0 2px #ffffff;
+        0 0 2px #ffffff,
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     78% {
       text-shadow:
-        0 0 0.2px #ffffff;
+        0 0 0.3px #ffffff;
       opacity: 0.45;
     }
     79% {
       text-shadow:
-        0 0 0.5px #ffffff,
         0 0 1px #ffffff,
-        0 0 1.5px #ffffff,
-        0 0 2px #ffffff;
+        0 0 2px #ffffff,
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
   }
@@ -734,13 +734,13 @@
     }
   }
 
-  /* Neon text with flicker - Slower, more noticeable */
+  /* Neon text with flicker - 2.8s */
   .neon-flicker {
-    animation: neon-flicker 4s infinite;
+    animation: neon-flicker 2.8s infinite;
   }
 
   .neon-flicker-white {
-    animation: neon-flicker-white 4s infinite;
+    animation: neon-flicker-white 2.8s infinite;
   }
 
   /* Line clamp */

@@ -520,9 +520,9 @@ export const SplashPage: React.FC = () => {
 
   return (
     <div className="h-screen bg-dark flex flex-col items-center justify-center p-4 pt-safe overflow-hidden relative">
-      {/* Background - Falling Circus Neon Decorations */}
+      {/* Background - Falling Circus Neon Decorations - 20 decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(8)].map((_, i) => {
+        {[...Array(20)].map((_, i) => {
           const variants: Array<'clown-face' | 'star' | 'balloon' | 'confetti'> = ['clown-face', 'star', 'balloon', 'confetti'];
           const colors: Array<'red' | 'white' | 'orange'> = ['red', 'white', 'orange'];
           const variant = variants[i % variants.length];
@@ -541,9 +541,9 @@ export const SplashPage: React.FC = () => {
               }}
               animate={{
                 y: ['0vh', '110vh'],
-                opacity: [0, 0.6, 0.6, 0],
+                opacity: [0, 0.5, 0.5, 0],
                 rotate: [0, 180, 360],
-                scale: [0.8, 1, 0.8],
+                scale: [0.7, 1, 0.7],
               }}
               transition={{
                 duration: fallDuration,
@@ -583,12 +583,12 @@ export const SplashPage: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           style={{
-            WebkitTextStroke: '0.3px #ffffff',
+            WebkitTextStroke: '0.6px #ffffff',
             textShadow: `
-              0 0 0.3px #ffffff,
-              0 0 0.6px #ffffff,
-              0 0 0.9px #ffffff,
-              0 0 1.2px #ffffff
+              0 0 1px #ffffff,
+              0 0 2px #ffffff,
+              0 0 3px #ffffff,
+              0 0 4px #ffffff
             `
           }}
         >
