@@ -455,17 +455,17 @@
     box-shadow: 0 0 30px rgba(78, 205, 196, 0.4);
   }
 
-  /* Neon Text Effects - Sharp, non-blurred, hand-drawn style */
+  /* Neon Text Effects - Sharp, non-blurred, hand-drawn style - Slim */
   .neon-red-orange {
     font-family: 'Kalam', 'Caveat', cursive;
     color: #ff4444;
-    -webkit-text-stroke: 1.5px #ff0000;
+    -webkit-text-stroke: 0.8px #ff0000;
     text-shadow:
+      0 0 1px #ff0000,
       0 0 2px #ff0000,
-      0 0 4px #ff0000,
-      0 0 6px #ff4444,
-      0 0 8px #ff6b35;
-    font-weight: 700;
+      0 0 3px #ff4444,
+      0 0 4px #ff6b35;
+    font-weight: 600;
     letter-spacing: 0.05em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -474,110 +474,110 @@
   .neon-white {
     font-family: 'Kalam', 'Caveat', cursive;
     color: #ffffff;
-    -webkit-text-stroke: 1.5px #ffffff;
+    -webkit-text-stroke: 0.8px #ffffff;
     text-shadow:
+      0 0 1px #ffffff,
       0 0 2px #ffffff,
-      0 0 4px #ffffff,
-      0 0 6px #ffffff,
-      0 0 8px #ffffff;
-    font-weight: 700;
+      0 0 3px #ffffff,
+      0 0 4px #ffffff;
+    font-weight: 600;
     letter-spacing: 0.03em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Neon Flicker Animation - Minimal blur */
+  /* Neon Flicker Animation - Slim */
   @keyframes neon-flicker {
     0%, 100% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     41.99% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     42% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.9;
     }
     43% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.9;
     }
     43.01% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     45.99% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     46% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.92;
     }
     47% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.92;
     }
     47.01% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     52.99% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
     53% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.9;
     }
     54% {
       text-shadow:
-        0 0 1px #ff0000,
-        0 0 2px #ff0000;
+        0 0 0.5px #ff0000,
+        0 0 1px #ff0000;
       opacity: 0.9;
     }
     54.01% {
       text-shadow:
+        0 0 1px #ff0000,
         0 0 2px #ff0000,
-        0 0 4px #ff0000,
-        0 0 6px #ff4444,
-        0 0 8px #ff6b35;
+        0 0 3px #ff4444,
+        0 0 4px #ff6b35;
       opacity: 1;
     }
   }
@@ -585,94 +585,94 @@
   @keyframes neon-flicker-white {
     0%, 100% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     41.99% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     42% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.9;
     }
     43% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.9;
     }
     43.01% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     45.99% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     46% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.92;
     }
     47% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.92;
     }
     47.01% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     52.99% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
     53% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.9;
     }
     54% {
       text-shadow:
-        0 0 1px #ffffff,
-        0 0 2px #ffffff;
+        0 0 0.5px #ffffff,
+        0 0 1px #ffffff;
       opacity: 0.9;
     }
     54.01% {
       text-shadow:
+        0 0 1px #ffffff,
         0 0 2px #ffffff,
-        0 0 4px #ffffff,
-        0 0 6px #ffffff,
-        0 0 8px #ffffff;
+        0 0 3px #ffffff,
+        0 0 4px #ffffff;
       opacity: 1;
     }
   }
