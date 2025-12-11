@@ -148,7 +148,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       setSquadre(squadreWithMembers);
 
       // Carica quest del giorno corrente
-      const giornoCorrente = gameStateData ? (gameStateData as Database['public']['Tables']['game_state']['Row']).giorno_corrente : 1;
+      // Assicurati che il giorno sia sempre tra 1 e 3 (il constraint del database lo richiede)
+      const giornoRaw = gameStateData ? (gameStateData as Database['public']['Tables']['game_state']['Row']).giorno_corrente : 1;
+      const giornoCorrente = (giornoRaw >= 1 && giornoRaw <= 3) ? giornoRaw : 1;
       
       // Se c'è un utente, carica le sue quest assegnate, altrimenti carica tutte le quest (per admin/preview)
       if (user) {
@@ -786,7 +788,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       if (error) throw error;
 
       // Segna la quest come completata nell'assegnazione
-      const giornoCorrente = gameState.giorno_corrente;
+      // Assicurati che il giorno sia sempre tra 1 e 3 (il constraint del database lo richiede)
+      const giornoRaw = gameState.giorno_corrente;
+      const giornoCorrente = (giornoRaw >= 1 && giornoRaw <= 3) ? giornoRaw : 1;
       await supabase
         .from('user_quest_assignments')
         .update({ completed_at: new Date().toISOString() })

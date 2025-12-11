@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, Image, Video, FileText, Clock } from 'lucide-react';
+import { Check, X, Image, Video, FileText, Clock, Play } from 'lucide-react';
 import type { ProvaQuest } from '../types';
 import { Avatar } from './Avatar';
 
@@ -16,6 +16,10 @@ const tipoIcon = {
 };
 
 export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => {
+  const [imageError, setImageError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  
   const percentuale = prova.voti_totali > 0 
     ? Math.round((prova.voti_positivi / prova.voti_totali) * 100) 
     : 0;
@@ -27,6 +31,14 @@ export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => 
     
     if (hours > 0) return `${hours}h fa`;
     return `${minutes}m fa`;
+  };
+
+  const isValidUrl = (url: string) => {
+    try {
+      return url && (url.startsWith('http://') || url.startsWith('https://'));
+    } catch {
+      return false;
+    }
   };
 
   return (
@@ -59,22 +71,74 @@ export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => 
         </div>
       </div>
 
-      {/* Content Preview - Compact */}
-      <div className="mb-2 rounded-2xl overflow-hidden glass p-2.5">
-        {prova.tipo === 'foto' && (
-          <div className="aspect-video glass rounded-xl flex items-center justify-center">
-            <Image className="text-gray-600" size={32} />
-            <span className="text-gray-600 ml-2 text-xs">Anteprima foto</span>
+      {/* Content Preview - Mostra contenuto reale */}
+      <div className="mb-2 rounded-2xl overflow-hidden glass">
+        {prova.tipo === 'foto' && isValidUrl(prova.contenuto) ? (
+          <div className="relative aspect-video bg-gray-900/50">
+            {!imageError ? (
+              <img 
+                src={prova.contenuto} 
+                alt="Prova quest"
+                className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                <Image size={32} />
+                <span className="text-xs mt-2">Errore caricamento immagine</span>
+              </div>
+            )}
           </div>
-        )}
-        {prova.tipo === 'video' && (
-          <div className="aspect-video glass rounded-xl flex items-center justify-center">
-            <Video className="text-gray-600" size={32} />
-            <span className="text-gray-600 ml-2 text-xs">Anteprima video</span>
+        ) : prova.tipo === 'video' && isValidUrl(prova.contenuto) ? (
+          <div className="relative aspect-video bg-gray-900/50">
+            {!videoError ? (
+              <>
+                {!isVideoPlaying ? (
+                  <div 
+                    className="w-full h-full flex items-center justify-center cursor-pointer"
+                    onClick={() => setIsVideoPlaying(true)}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-coral-500/80 flex items-center justify-center">
+                        <Play className="text-white ml-1" size={24} />
+                      </div>
+                    </div>
+                    <img 
+                      src={prova.contenuto} 
+                      alt="Video thumbnail"
+                      className="w-full h-full object-cover opacity-50"
+                      onError={() => setVideoError(true)}
+                    />
+                  </div>
+                ) : (
+                  <video 
+                    src={prova.contenuto}
+                    controls
+                    autoPlay
+                    className="w-full h-full object-cover"
+                    onError={() => setVideoError(true)}
+                  />
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                <Video size={32} />
+                <span className="text-xs mt-2">Errore caricamento video</span>
+              </div>
+            )}
           </div>
-        )}
-        {prova.tipo === 'testo' && (
-          <p className="text-gray-300 text-xs italic line-clamp-3">"{prova.contenuto}"</p>
+        ) : prova.tipo === 'testo' ? (
+          <div className="p-3">
+            <p className="text-gray-300 text-xs leading-relaxed">"{prova.contenuto}"</p>
+          </div>
+        ) : (
+          <div className="aspect-video glass rounded-xl flex items-center justify-center">
+            {React.cloneElement(tipoIcon[prova.tipo] as React.ReactElement, { 
+              size: 32, 
+              className: "text-gray-600" 
+            })}
+            <span className="text-gray-600 ml-2 text-xs">Contenuto non disponibile</span>
+          </div>
         )}
       </div>
 
@@ -99,7 +163,7 @@ export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => 
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => onVote(prova.id, false)}
-          className="flex-1 py-2.5 rounded-2xl glass border border-red-500/30 text-red-400 font-semibold text-xs flex items-center justify-center gap-1"
+          className="flex-1 py-2.5 rounded-2xl glass border border-red-500/30 text-red-400 font-semibold text-xs flex items-center justify-center gap-1 hover:bg-red-500/10 transition-colors"
         >
           <X size={14} />
           Rifiuta
@@ -107,7 +171,7 @@ export const VerificaCard: React.FC<VerificaCardProps> = ({ prova, onVote }) => 
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => onVote(prova.id, true)}
-          className="flex-1 py-2.5 rounded-2xl glass border border-green-500/30 text-green-400 font-semibold text-xs flex items-center justify-center gap-1"
+          className="flex-1 py-2.5 rounded-2xl glass border border-green-500/30 text-green-400 font-semibold text-xs flex items-center justify-center gap-1 hover:bg-green-500/10 transition-colors"
         >
           <Check size={14} />
           Valida
