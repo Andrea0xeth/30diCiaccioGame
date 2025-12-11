@@ -577,6 +577,21 @@ export const SplashPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
+        {/* DC-10 Plane Image - Above DC-30 */}
+        <motion.div
+          className="mb-2 flex justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <img 
+            src="/dc10plane.png" 
+            alt="DC-10 Plane" 
+            className="max-w-[120px] md:max-w-[150px]"
+            style={{ maxHeight: '100px', objectFit: 'contain', display: 'block' }}
+          />
+        </motion.div>
+
         {/* DC-30 - Main Neon Text */}
         <div className="neon-3d-glow mb-0">
           <h1 
@@ -588,23 +603,6 @@ export const SplashPage: React.FC = () => {
             DC-30
           </h1>
         </div>
-
-        {/* DC-10 Plane Image with LED Outline */}
-        <motion.div
-          className="mt-4 mb-2 flex justify-center"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <div className="led-outline-image-simple">
-            <img 
-              src="/dc10plane.png" 
-              alt="DC-10 Plane" 
-              className="max-w-xs md:max-w-sm"
-              style={{ maxHeight: '200px', objectFit: 'contain', display: 'block' }}
-            />
-          </div>
-        </motion.div>
 
         {/* Di Ciaccio - 30 - Small subtitle - White with D and C uppercase - Less visible */}
         <motion.p 
