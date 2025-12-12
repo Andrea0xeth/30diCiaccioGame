@@ -5,7 +5,7 @@ Worker Node.js per inviare notifiche push usando `web-push`.
 ## 🚀 Setup
 
 ### 1. Installa dipendenze
-
+ 
 ```bash
 cd apps/web/workers
 npm install
