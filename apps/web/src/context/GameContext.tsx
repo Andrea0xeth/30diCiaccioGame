@@ -207,6 +207,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
             tipo_prova: q.tipo_prova as ('foto' | 'video' | 'testo')[],
             emoji: q.emoji,
             scadenza: q.scadenza || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            completed: q.completed || false, // Indica se la quest è stata inviata
           }));
 
           setQuests(questsList);
@@ -552,6 +553,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       const userDataRow = userDataArray[0];
       console.log('[Login] ✅ Account trovato:', userDataRow.nickname);
       const loggedInUser = dbRowToUser(userDataRow);
+      
+      // Nota: Non creiamo una sessione Supabase Auth perché usiamo WebAuthn
+      // Le policy di storage permettono anon ma validano che l'userId esista in users
+      // Quindi l'upload funzionerà anche senza sessione Supabase Auth
+      
       setUser(loggedInUser);
       localStorage.setItem('30diciaccio_user', JSON.stringify(loggedInUser));
       localStorage.setItem('30diciaccio_passkey_id', credentialId);
@@ -800,9 +806,16 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       
       if (updateError) {
         console.error('Errore aggiornamento quest completata:', updateError);
+      } else {
+        console.log('[Submit Prova] ✅ Quest marcata come completata');
       }
 
-      // Aggiorna lo stato locale
+      // Aggiorna lo stato locale delle quest immediatamente
+      setQuests(prev => prev.map(q => 
+        q.id === questId ? { ...q, completed: true } : q
+      ));
+
+      // Aggiorna lo stato locale della prova
       const provaData: any = data;
       const nuovaProva: ProvaQuest = {
         id: provaData.id as string,
@@ -818,6 +831,9 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       };
 
       setProveInVerifica(prev => [nuovaProva, ...prev]);
+
+      // Ricarica i dati per sincronizzare con il database
+      await loadData();
     } catch (error) {
       console.error('Errore submit prova:', error);
       throw error;

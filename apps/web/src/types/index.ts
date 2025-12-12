@@ -51,6 +51,7 @@ export interface Quest {
   tipo_prova: ProofType[];
   emoji: string;
   scadenza: string;
+  completed?: boolean; // Indica se la quest è stata inviata/completata
 }
 
 export interface ProvaQuest {

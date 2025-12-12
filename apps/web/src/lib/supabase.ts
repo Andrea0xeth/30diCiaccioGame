@@ -34,6 +34,8 @@ export const uploadProofFile = async (
   questId: string
 ): Promise<string | null> => {
   try {
+    // Nota: Non verifichiamo la sessione Supabase Auth perché usiamo WebAuthn
+    // Le policy RLS permetteranno l'upload se configurate correttamente
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/${questId}/${Date.now()}.${fileExt}`;
     

@@ -177,18 +177,18 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
     return (
       <motion.div 
         layout
-        className="card border-green-500/30"
-        style={{ background: 'rgba(34, 197, 94, 0.08)', borderColor: 'rgba(34, 197, 94, 0.3)' }}
+        className="card border-turquoise-500/30"
+        style={{ background: 'rgba(78, 205, 196, 0.08)', borderColor: 'rgba(78, 205, 196, 0.3)' }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-12 h-12 rounded-2xl bg-green-500/20 flex items-center justify-center text-xl flex-shrink-0">
-            <Check className="text-green-400" size={20} />
+          <div className="w-12 h-12 rounded-2xl bg-turquoise-500/20 flex items-center justify-center text-xl flex-shrink-0">
+            <Check className="text-turquoise-400" size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-green-400 line-through opacity-70 text-sm truncate">
+            <h3 className="font-semibold text-turquoise-400 text-sm truncate">
               {quest.emoji} {quest.titolo}
             </h3>
-            <p className="text-[10px] text-gray-500">Completata! +{quest.punti}pts</p>
+            <p className="text-[10px] text-gray-500">Prova inviata! In attesa di verifica</p>
           </div>
         </div>
       </motion.div>

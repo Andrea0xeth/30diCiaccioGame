@@ -11,7 +11,29 @@ Le policy RLS (Row Level Security) per il bucket `prove-quest` non sono configur
 
 ## Soluzione
 
-### Opzione 1: Eseguire lo script SQL (Consigliato)
+### Opzione 1: Script automatico (Più facile) ⭐
+
+1. Assicurati di avere configurato le variabili d'ambiente:
+   ```bash
+   # Nel file .env.local o .env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   ```
+
+2. Esegui lo script:
+   ```bash
+   pnpm --filter @30diciaccio/web apply:storage-policies
+   ```
+
+   Oppure:
+   ```bash
+   cd apps/web
+   node scripts/apply-storage-policies.js
+   ```
+
+Lo script applicherà automaticamente tutte le policy necessarie.
+
+### Opzione 2: Eseguire lo script SQL manualmente
 
 1. Vai alla dashboard Supabase del tuo progetto
 2. Apri il SQL Editor: https://supabase.com/dashboard/project/[PROJECT-REF]/sql/new
@@ -22,7 +44,7 @@ Lo script creerà le policy necessarie per:
 - ✅ Permettere agli utenti autenticati di caricare prove (foto/video)
 - ✅ Permettere la lettura pubblica dei file
 
-### Opzione 2: Configurare manualmente dalla Dashboard
+### Opzione 3: Configurare manualmente dalla Dashboard
 
 1. Vai su: **Storage** > **Policies** nel dashboard Supabase
 2. Seleziona il bucket `prove-quest`

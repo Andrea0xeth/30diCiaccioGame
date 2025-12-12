@@ -113,7 +113,18 @@ export const HomePage: React.FC = () => {
 
       {/* Content - Scrollable, passes under navbar - 8pt grid spacing */}
       <div className="flex-1 px-4 py-3 pb-28 space-y-4">
-        {/* Quest Section */}
+        {/* Next Gara Section - Prima delle Quest */}
+        {nextGara && (
+          <section>
+            <h2 className="font-display font-bold text-sm flex items-center gap-2 mb-3">
+              <CircusNeonDecorations variant="clown-face" size="small" color="orange" />
+              Prossima Gara
+            </h2>
+            <GaraCard gara={nextGara} />
+          </section>
+        )}
+
+        {/* Quest Section - Dopo la Gara */}
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-display font-bold text-sm flex items-center gap-2">
@@ -134,22 +145,12 @@ export const HomePage: React.FC = () => {
                 <QuestCard 
                   quest={quest} 
                   onSubmit={submitProva}
+                  completed={quest.completed}
                 />
               </motion.div>
             ))}
           </div>
         </section>
-
-        {/* Next Gara Section */}
-        {nextGara && (
-          <section>
-            <h2 className="font-display font-bold text-sm flex items-center gap-2 mb-3">
-              <CircusNeonDecorations variant="clown-face" size="small" color="orange" />
-              Prossima Gara
-            </h2>
-            <GaraCard gara={nextGara} />
-          </section>
-        )}
       </div>
 
       {/* Verifica Modal */}
