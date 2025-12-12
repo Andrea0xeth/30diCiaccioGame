@@ -35,6 +35,7 @@ export const AdminPage: React.FC = () => {
   const [showPushNotificationModal, setShowPushNotificationModal] = useState(false);
   const [isSubmittingBonus, setIsSubmittingBonus] = useState(false);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
+  const [hasProcessedQueue, setHasProcessedQueue] = useState(false);
   const [queueProcessResult, setQueueProcessResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Listener per aprire il modal classifica
@@ -88,7 +89,7 @@ export const AdminPage: React.FC = () => {
   };
 
   const handleProcessQueue = async () => {
-    if (isProcessingQueue) return;
+    if (isProcessingQueue || hasProcessedQueue) return;
     
     setIsProcessingQueue(true);
     setQueueProcessResult(null);
@@ -118,6 +119,7 @@ export const AdminPage: React.FC = () => {
       setTimeout(() => setQueueProcessResult(null), 5000);
     } finally {
       setIsProcessingQueue(false);
+      setHasProcessedQueue(true);
     }
   };
 
@@ -152,7 +154,7 @@ export const AdminPage: React.FC = () => {
             </button>
             <button
               onClick={handleProcessQueue}
-              disabled={isProcessingQueue}
+              disabled={isProcessingQueue || hasProcessedQueue}
               className="btn-secondary flex items-center gap-2 text-sm py-2 px-4 disabled:opacity-50"
             >
               {isProcessingQueue ? (
