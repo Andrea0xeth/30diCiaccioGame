@@ -272,9 +272,24 @@ async function processQueue() {
   }
 }
 
+// Helper per impostare CORS headers
+function setCorsHeaders(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age', '86400');
+}
+
 export default async function handler(req, res) {
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    setCorsHeaders(res);
+    return res.status(200).json({ ok: true });
+  }
+
   // Accetta sia GET (per cron esterni) che POST (per chiamate manuali)
   if (req.method !== 'GET' && req.method !== 'POST') {
+    setCorsHeaders(res);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -282,6 +297,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const cronSecret = process.env.CRON_SECRET;
     if (cronSecret && req.headers.authorization !== `Bearer ${cronSecret}`) {
+      setCorsHeaders(res);
       return res.status(401).json({ error: 'Unauthorized' });
     }
   }
@@ -294,6 +310,7 @@ export default async function handler(req, res) {
     console.log(`🔄 Starting push notification worker via ${req.method}...`);
     const result = await processQueue();
     
+    setCorsHeaders(res);
     return res.status(200).json({ 
       success: true,
       message: 'Queue processed successfully',
@@ -302,6 +319,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('❌ Error processing queue:', error);
+    setCorsHeaders(res);
     return res.status(500).json({ 
       error: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
