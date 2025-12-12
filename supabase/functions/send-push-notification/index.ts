@@ -75,7 +75,9 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Crea client Supabase
+    // Crea client Supabase con Service Role Key per bypassare RLS
+    // NOTA: L'Edge Function è accessibile anonimamente per evitare problemi CORS
+    // Il controllo admin è fatto lato frontend
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)

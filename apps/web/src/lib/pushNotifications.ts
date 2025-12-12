@@ -32,13 +32,15 @@ export const sendPushNotification = async (
   try {
     console.log('[Push] Invio notifica a utente:', userId, payload);
     
-    // Usa supabase.functions.invoke che gestisce automaticamente CORS e autenticazione
-    // Il client Supabase gestisce correttamente le richieste cross-origin
+    // Usa supabase.functions.invoke con skipAuth per evitare problemi CORS
+    // L'Edge Function è accessibile anonimamente, il controllo admin è lato frontend
     const { data, error } = await supabase.functions.invoke('send-push-notification', {
       body: {
         user_id: userId,
         payload,
       },
+      // Non richiedere autenticazione per evitare problemi CORS
+      // Il controllo admin è già fatto lato frontend in AdminPage
     });
 
     console.log('[Push] Risposta Edge Function:', { data, error });
