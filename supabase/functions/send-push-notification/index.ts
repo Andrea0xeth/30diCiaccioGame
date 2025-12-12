@@ -42,9 +42,27 @@ Deno.serve(async (req) => {
       )
     }
 
-    const { user_id, payload } = await req.json()
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (err) {
+      console.error('Error parsing request body:', err);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body', details: err instanceof Error ? err.message : 'Unknown error' }),
+        { 
+          status: 400, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
+      )
+    }
+
+    const { user_id, payload } = requestBody;
 
     if (!user_id || !payload) {
+      console.error('Missing required fields:', { user_id: !!user_id, payload: !!payload });
       return new Response(
         JSON.stringify({ error: 'user_id and payload are required' }),
         { 
@@ -56,6 +74,8 @@ Deno.serve(async (req) => {
         }
       )
     }
+
+    console.log('Request received:', { user_id, payload: { title: payload?.title, body: payload?.body } });
 
     // Verifica chiavi VAPID
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
@@ -134,11 +154,29 @@ Deno.serve(async (req) => {
     })
 
     // Configura VAPID
-    webpush.setVapidDetails(
-      'mailto:admin@30diciaccio.it',
-      VAPID_PUBLIC_KEY,
-      VAPID_PRIVATE_KEY
-    )
+    try {
+      webpush.setVapidDetails(
+        'mailto:admin@30diciaccio.it',
+        VAPID_PUBLIC_KEY,
+        VAPID_PRIVATE_KEY
+      )
+      console.log('VAPID configured successfully');
+    } catch (err) {
+      console.error('Error setting VAPID details:', err);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Error configuring VAPID',
+          details: err instanceof Error ? err.message : 'Unknown error'
+        }),
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
+      )
+    }
 
     // Invia notifiche a tutte le subscription
     const results = await Promise.allSettled(
@@ -242,11 +280,16 @@ Deno.serve(async (req) => {
       }
     )
   } catch (error: any) {
-    console.error('Fatal error:', error)
+    console.error('Fatal error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    
     return new Response(
       JSON.stringify({ 
         error: error.message || 'Internal server error',
-        details: error.stack 
+        details: error.stack,
+        name: error.name,
       }),
       { 
         status: 500, 
