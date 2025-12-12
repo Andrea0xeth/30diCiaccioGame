@@ -976,41 +976,74 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   };
 
   const aggiungiBonus = async (userId: string, punti: number, motivo: string) => {
-    if (!user || !user.is_admin || !isSupabaseConfigured()) return;
+    if (!user || !user.is_admin || !isSupabaseConfigured()) {
+      throw new Error('Solo gli admin possono assegnare bonus punti');
+    }
     
     try {
+      console.log('[Aggiungi Bonus] Dati bonus:', {
+        userId,
+        adminId: user.id,
+        punti,
+        motivo,
+      });
+
       // Inserisci il bonus
-      const { error: bonusError } = await supabase
+      const { data: bonusData, error: bonusError } = await supabase
         .from('bonus_punti')
         .insert({
           user_id: userId,
           admin_id: user.id,
           punti,
           motivo,
-        } as any);
+        } as any)
+        .select();
 
-      if (bonusError) throw bonusError;
+      if (bonusError) {
+        console.error('[Aggiungi Bonus] Errore inserimento bonus:', bonusError);
+        throw new Error(`Errore durante l'inserimento del bonus: ${bonusError.message}`);
+      }
+
+      console.log('[Aggiungi Bonus] ✅ Bonus inserito:', bonusData);
 
       // Aggiorna i punti dell'utente
-      const { data: userData } = await supabase
+      const { data: userData, error: userDataError } = await supabase
         .from('users')
         .select('punti_personali')
         .eq('id', userId)
         .single();
 
+      if (userDataError) {
+        console.error('[Aggiungi Bonus] Errore lettura utente:', userDataError);
+        throw new Error(`Errore durante la lettura dei dati utente: ${userDataError.message}`);
+      }
+
       if (userData) {
         const userRow = userData as any;
-        const newPunti = (userRow.punti_personali || 0) + punti;
+        const currentPunti = userRow.punti_personali || 0;
+        const newPunti = currentPunti + punti;
+        
+        console.log('[Aggiungi Bonus] Aggiornamento punti:', {
+          currentPunti,
+          puntiBonus: punti,
+          newPunti,
+        });
+
         const { error: updateError } = await (supabase
           .from('users') as any)
           .update({ punti_personali: newPunti })
           .eq('id', userId);
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('[Aggiungi Bonus] Errore aggiornamento punti:', updateError);
+          throw new Error(`Errore durante l'aggiornamento dei punti: ${updateError.message}`);
+        }
+
+        console.log('[Aggiungi Bonus] ✅ Punti aggiornati');
       }
 
       // Crea notifica
-      await supabase
+      const { error: notificaError } = await supabase
         .from('notifiche')
         .insert({
           user_id: userId,
@@ -1019,10 +1052,19 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
           tipo: 'bonus',
         } as any);
 
+      if (notificaError) {
+        console.error('[Aggiungi Bonus] ⚠️ Errore creazione notifica:', notificaError);
+        // Non blocchiamo il processo se la notifica fallisce
+      } else {
+        console.log('[Aggiungi Bonus] ✅ Notifica creata');
+      }
+
       // Ricarica i dati
       await loadData();
+      
+      console.log('[Aggiungi Bonus] ✅ Processo completato con successo');
     } catch (error) {
-      console.error('Errore aggiunta bonus:', error);
+      console.error('[Aggiungi Bonus] ❌ Errore completo:', error);
       throw error;
     }
   };

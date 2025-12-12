@@ -1,7 +1,6 @@
 // Edge Function per inviare notifiche push
 // Deploy: supabase functions deploy send-push-notification
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Importa web-push tramite esm.sh (compatibile con Deno/Supabase)
@@ -14,16 +13,16 @@ const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') || ''
 // CORS headers da includere in tutte le risposte
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Max-Age': '86400',
 }
 
-serve(async (req) => {
-  // Handle CORS preflight
+Deno.serve(async (req) => {
+  // Handle CORS preflight - DEVE essere la prima cosa
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
+    return new Response('ok', {
+      status: 200,
       headers: corsHeaders,
     })
   }

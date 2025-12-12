@@ -32,16 +32,49 @@ export const sendPushNotification = async (
   try {
     console.log('[Push] Invio notifica a utente:', userId, payload);
     
-    // Chiama la Edge Function per inviare la notifica push
-    // La Edge Function userà web-push per inviare la notifica
-    const { data, error } = await supabase.functions.invoke('send-push-notification', {
-      body: {
+    // Ottieni URL e chiave Supabase
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('[Push] Supabase URL o chiave non configurati');
+      return false;
+    }
+    
+    // Chiama la Edge Function direttamente con fetch per avere più controllo su CORS
+    const functionUrl = `${supabaseUrl}/functions/v1/send-push-notification`;
+    
+    console.log('[Push] Chiamata Edge Function:', functionUrl);
+    
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+      },
+      body: JSON.stringify({
         user_id: userId,
         payload,
-      },
+      }),
     });
 
-    console.log('[Push] Risposta Edge Function:', { data, error });
+    console.log('[Push] Risposta HTTP:', response.status, response.statusText);
+    
+    let data = null;
+    let error = null;
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Push] Errore risposta:', errorText);
+      error = {
+        message: `HTTP ${response.status}: ${response.statusText}`,
+        details: errorText,
+      };
+    } else {
+      data = await response.json();
+      console.log('[Push] Dati risposta:', data);
+    }
 
     if (error) {
       console.error('[Push] Errore invio notifica push:', error);
