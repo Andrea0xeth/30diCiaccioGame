@@ -166,10 +166,11 @@ export const HomePage: React.FC = () => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25 }}
-              className="w-full max-h-[85vh] glass-strong rounded-t-3xl p-3 overflow-y-auto scrollbar-hide"
+              className="w-full max-h-[90vh] glass-strong rounded-t-3xl overflow-hidden flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-3">
+              {/* Header - Fixed */}
+              <div className="flex-shrink-0 flex items-center justify-between px-4 pt-4 pb-3 border-b border-white/10">
                 <h2 className="font-display font-bold text-lg flex items-center gap-1.5">
                   <CheckCircle2 className="text-turquoise-400" size={18} />
                   Verifica Quest
@@ -182,25 +183,28 @@ export const HomePage: React.FC = () => {
                 </button>
               </div>
               
-              {pendingVerifications.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <CheckCircle2 size={36} className="mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Nessuna prova da verificare!</p>
-                  <p className="text-xs">Torna più tardi 😊</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {pendingVerifications.map((prova) => (
-                    <VerificaCard 
-                      key={prova.id} 
-                      prova={prova} 
-                      onVote={(id, valore) => {
-                        votaProva(id, valore);
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
+              {/* Content - Scrollable */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-4 pb-6">
+                {pendingVerifications.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <CheckCircle2 size={36} className="mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">Nessuna prova da verificare!</p>
+                    <p className="text-xs">Torna più tardi 😊</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingVerifications.map((prova) => (
+                      <VerificaCard 
+                        key={prova.id} 
+                        prova={prova} 
+                        onVote={(id, valore) => {
+                          votaProva(id, valore);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}
