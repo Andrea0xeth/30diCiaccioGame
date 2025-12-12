@@ -230,7 +230,21 @@ Deno.serve(async (req) => {
       r.status === 'fulfilled' && r.value.disabled === true
     ).length
 
-    // Crea notifica nel database per tracciamento
+    // Aggiungi alla coda push notifications (il worker Node.js le processerà)
+    await supabase
+      .from('push_notifications_queue')
+      .insert({
+        user_id: user_id,
+        title: payload.title || 'Notifica Push',
+        body: payload.body || payload.message || 'Notifica inviata',
+        icon: payload.icon || '/pwa-192x192.png',
+        badge: payload.badge || '/pwa-192x192.png',
+        url: payload.url || '/',
+        data: payload.data || {},
+        status: 'pending',
+      })
+
+    // Crea anche notifica nel database per tracciamento
     await supabase
       .from('notifiche')
       .insert({

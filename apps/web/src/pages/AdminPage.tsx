@@ -32,6 +32,7 @@ export const AdminPage: React.FC = () => {
   const [selectedGaraForClassifica, setSelectedGaraForClassifica] = useState<Gara | null>(null);
   const [showCreaGara, setShowCreaGara] = useState(false);
   const [showPushNotificationModal, setShowPushNotificationModal] = useState(false);
+  const [isSubmittingBonus, setIsSubmittingBonus] = useState(false);
 
   // Listener per aprire il modal classifica
   useEffect(() => {
@@ -62,16 +63,25 @@ export const AdminPage: React.FC = () => {
   );
 
   const handleBonusSubmit = async () => {
-    if (!selectedUser || !bonusPoints || !bonusMotivo) return;
+    if (!selectedUser || !bonusPoints || !bonusMotivo || isSubmittingBonus) return;
     
-    await aggiungiBonus(selectedUser, parseInt(bonusPoints), bonusMotivo);
-    
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-    
-    setSelectedUser(null);
-    setBonusPoints('');
-    setBonusMotivo('');
+    setIsSubmittingBonus(true);
+    try {
+      await aggiungiBonus(selectedUser, parseInt(bonusPoints), bonusMotivo);
+      
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      
+      setSelectedUser(null);
+      setSearchQuery('');
+      setBonusPoints('');
+      setBonusMotivo('');
+    } catch (error) {
+      console.error('Errore assegnazione bonus:', error);
+      // L'errore viene già gestito dalla funzione aggiungiBonus
+    } finally {
+      setIsSubmittingBonus(false);
+    }
   };
 
   const motivoOptions = [
@@ -259,7 +269,7 @@ export const AdminPage: React.FC = () => {
               </div>
 
               {/* User List */}
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-96 overflow-y-auto">
                 {filteredUsers.length === 0 ? (
                   <div className="card text-center py-8 text-gray-500">
                     <p className="text-sm">Nessun utente trovato</p>
@@ -346,11 +356,24 @@ export const AdminPage: React.FC = () => {
                     </button>
                     <button
                       onClick={handleBonusSubmit}
-                      disabled={!bonusPoints || !bonusMotivo}
-                      className="btn-primary flex-1 disabled:opacity-50"
+                      disabled={!bonusPoints || !bonusMotivo || isSubmittingBonus}
+                      className="btn-primary flex-1 disabled:opacity-50 flex items-center justify-center"
                     >
-                      <Plus size={18} className="inline mr-2" />
-                      Assegna Bonus
+                      {isSubmittingBonus ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                            className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                          />
+                          Caricamento...
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={18} className="inline mr-2" />
+                          Assegna Bonus
+                        </>
+                      )}
                     </button>
                   </div>
                 </motion.div>
