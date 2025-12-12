@@ -78,25 +78,40 @@ export const useOneSignal = (): UseOneSignalReturn => {
     setError(null);
 
     try {
-      // Imposta i tag dell'utente se forniti (per segmentazione)
-      if (userId) {
-        await window.OneSignal.sendTag('user_id', userId);
-      }
-      if (squadraId) {
-        await window.OneSignal.sendTag('squadra_id', squadraId);
-      }
-
-      // Verifica se è già iscritto
+      // Verifica se è già iscritto prima di procedere
       const isOptedIn = await window.OneSignal.isPushNotificationsEnabled();
       
-      if (isOptedIn) {
-        setIsSubscribed(true);
-        setIsLoading(false);
-        return true;
+      // Se non è iscritto, richiedi permesso e iscriviti
+      if (!isOptedIn) {
+        await window.OneSignal.registerForPushNotifications();
+        
+        // Attendi un momento per assicurarsi che l'iscrizione sia completata
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
-      // Richiedi permesso e iscriviti
-      await window.OneSignal.registerForPushNotifications();
+      // Imposta i tag dell'utente se forniti (per segmentazione)
+      // Usa sendTags (plurale) se disponibile, altrimenti sendTag (singolare)
+      if (userId || squadraId) {
+        const tags: { [key: string]: string } = {};
+        if (userId) {
+          tags.user_id = userId;
+        }
+        if (squadraId) {
+          tags.squadra_id = squadraId;
+        }
+
+        // Prova prima con sendTags (API più recente)
+        if (typeof window.OneSignal.sendTags === 'function') {
+          await window.OneSignal.sendTags(tags);
+        } else if (typeof window.OneSignal.sendTag === 'function') {
+          // Fallback alla versione singolare
+          for (const [key, value] of Object.entries(tags)) {
+            await window.OneSignal.sendTag(key, value);
+          }
+        } else {
+          console.warn('[OneSignal] sendTags/sendTag non disponibile, i tag non verranno impostati');
+        }
+      }
       
       // Verifica di nuovo lo stato
       const newState = await window.OneSignal.isPushNotificationsEnabled();
@@ -122,6 +137,14 @@ export const useOneSignal = (): UseOneSignalReturn => {
     setError(null);
 
     try {
+      // Rimuovi i tag prima di disiscrivere
+      if (typeof window.OneSignal.deleteTags === 'function') {
+        await window.OneSignal.deleteTags(['user_id', 'squadra_id']);
+      } else if (typeof window.OneSignal.deleteTag === 'function') {
+        await window.OneSignal.deleteTag('user_id');
+        await window.OneSignal.deleteTag('squadra_id');
+      }
+
       await window.OneSignal.setSubscription(false);
       setIsSubscribed(false);
       setIsLoading(false);

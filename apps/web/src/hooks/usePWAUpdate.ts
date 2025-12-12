@@ -4,6 +4,10 @@ interface UsePWAUpdateOptions {
   autoUpdateDelay?: number; // Tempo in ms prima dell'aggiornamento automatico (0 = disabilitato)
 }
 
+// Chiave per localStorage per tracciare se un aggiornamento è stato già triggerato
+const UPDATE_TRIGGERED_KEY = 'pwa_update_triggered';
+const UPDATE_VERSION_KEY = 'pwa_update_version';
+
 export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
   // Aggiornamento automatico dopo 2 secondi (per dare tempo all'utente di vedere il messaggio)
   const { autoUpdateDelay = 2000 } = options;
@@ -12,7 +16,7 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const autoUpdateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const updateServiceWorkerRef = useRef<(() => Promise<void>) | null>(null);
-  const hasTriggeredUpdateRef = useRef(false); // Flag per evitare doppi trigger
+  const hasTriggeredUpdateRef = useRef(false); // Flag per evitare doppi trigger nella stessa sessione
 
   const updateServiceWorker = useCallback(async () => {
     const currentRegistration = registration;
@@ -20,11 +24,29 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
       return;
     }
 
-    // Evita doppi trigger
+    // Evita doppi trigger nella stessa sessione
     if (hasTriggeredUpdateRef.current) {
       return;
     }
+
+    // Controlla se abbiamo già triggerato un aggiornamento per questa versione
+    const waitingWorker = currentRegistration.waiting;
+    const waitingScriptUrl = waitingWorker.scriptURL;
+    const updateVersion = waitingScriptUrl; // Usa l'URL del service worker come versione
+    
+    const lastTriggeredVersion = localStorage.getItem(UPDATE_VERSION_KEY);
+    if (lastTriggeredVersion === updateVersion) {
+      // Abbiamo già triggerato l'aggiornamento per questa versione, non rifarlo
+      console.log('[PWA Update] Aggiornamento già triggerato per questa versione, skip');
+      setUpdateAvailable(false);
+      return;
+    }
+
     hasTriggeredUpdateRef.current = true;
+
+    // Salva nello storage che abbiamo triggerato l'aggiornamento per questa versione
+    localStorage.setItem(UPDATE_TRIGGERED_KEY, 'true');
+    localStorage.setItem(UPDATE_VERSION_KEY, updateVersion);
 
     // Cancella l'aggiornamento automatico se era programmato
     if (autoUpdateTimeoutRef.current) {
@@ -114,18 +136,34 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
         if (!reg.waiting && !reg.installing) {
           setUpdateAvailable(false);
           hasTriggeredUpdateRef.current = false;
+          // Pulisci il flag di aggiornamento triggerato se non ci sono più aggiornamenti
+          localStorage.removeItem(UPDATE_TRIGGERED_KEY);
+          localStorage.removeItem(UPDATE_VERSION_KEY);
           return;
         }
 
         // Controlla se c'è un service worker in attesa
-        if (reg.waiting && !hasTriggeredUpdateRef.current) {
-          setUpdateAvailable(true);
+        if (reg.waiting) {
+          // Verifica se abbiamo già triggerato l'aggiornamento per questa versione
+          const waitingScriptUrl = reg.waiting.scriptURL;
+          const lastTriggeredVersion = localStorage.getItem(UPDATE_VERSION_KEY);
           
-          // Se è configurato l'aggiornamento automatico, programma il reload
-          if (autoUpdateDelay > 0 && !autoUpdateTimeoutRef.current && updateServiceWorkerRef.current) {
-            autoUpdateTimeoutRef.current = setTimeout(() => {
-              updateServiceWorkerRef.current?.();
-            }, autoUpdateDelay);
+          if (lastTriggeredVersion === waitingScriptUrl) {
+            // Abbiamo già triggerato l'aggiornamento per questa versione, non mostrare il banner
+            setUpdateAvailable(false);
+            return;
+          }
+
+          // Se non abbiamo ancora triggerato per questa versione, mostra il banner
+          if (!hasTriggeredUpdateRef.current) {
+            setUpdateAvailable(true);
+            
+            // Se è configurato l'aggiornamento automatico, programma il reload
+            if (autoUpdateDelay > 0 && !autoUpdateTimeoutRef.current && updateServiceWorkerRef.current) {
+              autoUpdateTimeoutRef.current = setTimeout(() => {
+                updateServiceWorkerRef.current?.();
+              }, autoUpdateDelay);
+            }
           }
           return;
         }
@@ -135,7 +173,15 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
           const installingWorker = reg.installing;
           
           installingWorker.addEventListener('statechange', () => {
-            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller && !hasTriggeredUpdateRef.current) {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Verifica se abbiamo già triggerato l'aggiornamento per questa versione
+              const installingScriptUrl = installingWorker.scriptURL;
+              const lastTriggeredVersion = localStorage.getItem(UPDATE_VERSION_KEY);
+              
+              if (lastTriggeredVersion === installingScriptUrl || hasTriggeredUpdateRef.current) {
+                return; // Già triggerato, skip
+              }
+
               // C'è un nuovo service worker installato e pronto
               setUpdateAvailable(true);
               
@@ -154,7 +200,15 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
           const newWorker = reg.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !hasTriggeredUpdateRef.current) {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Verifica se abbiamo già triggerato l'aggiornamento per questa versione
+                const newWorkerScriptUrl = newWorker.scriptURL;
+                const lastTriggeredVersion = localStorage.getItem(UPDATE_VERSION_KEY);
+                
+                if (lastTriggeredVersion === newWorkerScriptUrl || hasTriggeredUpdateRef.current) {
+                  return; // Già triggerato, skip
+                }
+
                 // Nuovo service worker installato
                 setUpdateAvailable(true);
                 
