@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { Clock, Camera, Video, FileText, ChevronRight, Check, Upload, X, Loader2 } from 'lucide-react';
+import { Clock, Camera, Video, FileText, ChevronRight, Check, Upload, X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { Quest } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface QuestCardProps {
   quest: Quest;
-  onSubmit: (questId: string, tipo: 'foto' | 'video' | 'testo', contenuto: string | File) => void;
+  onSubmit: (questId: string, tipo: 'foto' | 'video' | 'testo', contenuto: string | File) => Promise<void>;
   completed?: boolean;
 }
 
@@ -31,6 +31,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -108,6 +109,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
     if (isUploading) return;
     
     setError(null);
+    setSuccess(false);
     
     try {
       setIsUploading(true);
@@ -118,31 +120,38 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
           setIsUploading(false);
           return;
         }
-        onSubmit(quest.id, 'testo', proofText);
+        await onSubmit(quest.id, 'testo', proofText);
       } else if (selectedType === 'foto' || selectedType === 'video') {
         if (!selectedFile) {
           setError('Seleziona un file');
           setIsUploading(false);
           return;
         }
-        onSubmit(quest.id, selectedType, selectedFile);
+        await onSubmit(quest.id, selectedType, selectedFile);
       } else {
         setError('Seleziona un tipo di prova');
         setIsUploading(false);
         return;
       }
 
-      // Reset form dopo invio riuscito
-      setIsExpanded(false);
-      setSelectedType(null);
-      setProofText('');
-      setSelectedFile(null);
-      setFilePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      // Successo!
+      setSuccess(true);
+      
+      // Reset form dopo 2 secondi per mostrare il messaggio di successo
+      setTimeout(() => {
+        setIsExpanded(false);
+        setSelectedType(null);
+        setProofText('');
+        setSelectedFile(null);
+        setFilePreview(null);
+        setSuccess(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Errore durante l\'invio della prova');
+      setError(err instanceof Error ? err.message : 'Errore durante il caricamento della prova');
+      setSuccess(false);
     } finally {
       setIsUploading(false);
     }
@@ -157,6 +166,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
       setSelectedFile(null);
       setFilePreview(null);
       setError(null);
+      setSuccess(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -233,12 +243,49 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
             <div className="pt-3 mt-3 border-t border-gray-700/50">
               <p className="text-xs text-gray-400 mb-3 leading-relaxed">{quest.descrizione}</p>
               
+              {/* Success message */}
+              <AnimatePresence>
+                {success && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="mb-3 p-3 rounded-xl bg-green-500/10 border border-green-500/30"
+                  >
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="text-green-400 flex-shrink-0" size={18} />
+                      <div className="flex-1">
+                        <p className="text-green-400 font-semibold text-sm">Caricamento completato!</p>
+                        <p className="text-green-400/80 text-xs mt-0.5">
+                          {selectedType === 'foto' && 'La tua foto è stata caricata con successo'}
+                          {selectedType === 'video' && 'Il tuo video è stato caricato con successo'}
+                          {selectedType === 'testo' && 'Il tuo testo è stato inviato con successo'}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Error message */}
-              {error && (
-                <div className="mb-3 p-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
-                  {error}
-                </div>
-              )}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    className="mb-3 p-3 rounded-xl bg-red-500/10 border border-red-500/30"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="text-red-400 flex-shrink-0" size={18} />
+                      <div className="flex-1">
+                        <p className="text-red-400 font-semibold text-sm">Errore nel caricamento</p>
+                        <p className="text-red-400/80 text-xs mt-0.5">{error}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Proof Type Selection - Compact */}
               <div className="flex gap-1.5 mb-3">
@@ -354,6 +401,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
                   onClick={handleProofSubmit}
                   disabled={
                     isUploading || 
+                    success ||
                     !selectedType || 
                     (selectedType === 'testo' && !proofText.trim()) ||
                     ((selectedType === 'foto' || selectedType === 'video') && !selectedFile)
@@ -363,7 +411,17 @@ export const QuestCard: React.FC<QuestCardProps> = ({ quest, onSubmit, completed
                   {isUploading ? (
                     <>
                       <Loader2 className="animate-spin" size={14} />
-                      <span>Caricamento...</span>
+                      <span>
+                        {selectedType === 'foto' && 'Caricamento foto...'}
+                        {selectedType === 'video' && 'Caricamento video...'}
+                        {selectedType === 'testo' && 'Invio in corso...'}
+                        {!selectedType && 'Caricamento...'}
+                      </span>
+                    </>
+                  ) : success ? (
+                    <>
+                      <CheckCircle2 size={14} />
+                      <span>Completato!</span>
                     </>
                   ) : (
                     <span>{selectedType === 'testo' ? 'Invia' : 'Carica'}</span>
