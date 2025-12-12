@@ -5,7 +5,8 @@ interface UsePWAUpdateOptions {
 }
 
 export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
-  const { autoUpdateDelay = 0 } = options;
+  // Aggiornamento automatico dopo 2 secondi (per dare tempo all'utente di vedere il messaggio)
+  const { autoUpdateDelay = 3000 } = options;
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -215,5 +216,6 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
     dismissUpdate,
   };
 };
+
 
 
