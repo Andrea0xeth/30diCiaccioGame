@@ -23,7 +23,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         name: '30diCiaccioGame',
-        short_name: '30CiaccioGame',
+        short_name: 'DC-30',
         description: 'Il gioco del 30° compleanno di Di Ciaccio!',
         theme_color: '#FF6B6B',
         background_color: '#1A1A1A',
