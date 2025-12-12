@@ -1,7 +1,8 @@
 {
-  "buildCommand": "cd apps/web && npm run build",
+  "buildCommand": "pnpm install && pnpm --filter @30diciaccio/web build",
   "outputDirectory": "apps/web/dist",
   "framework": "vite",
+  "installCommand": "pnpm install",
   "rewrites": [
     {
       "source": "/(.*)",
