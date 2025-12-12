@@ -445,3 +445,4 @@ ON CONFLICT (nome) DO NOTHING;
 -- - Definire classifiche per le gare completate (primo, secondo, terzo, ecc.)
 -- - I punti vengono distribuiti automaticamente in base alla posizione
 
+

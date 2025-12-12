@@ -91,6 +91,88 @@ export const isPlatformAuthenticatorAvailable = async (): Promise<boolean> => {
 };
 
 /**
+ * Verifica se ci sono passkey disponibili per questo sito
+ * 
+ * NOTA: Per motivi di privacy, i browser non permettono di enumerare le passkey
+ * senza interazione dell'utente. Questa funzione usa un approccio euristico:
+ * 1. Verifica se c'è un passkey_id salvato in localStorage
+ * 2. Tenta una verifica silenziosa con Conditional Mediation (se supportato)
+ * 3. Verifica se WebAuthn è supportato e se c'è un autenticatore disponibile
+ * 
+ * @returns true se è probabile che ci siano passkey disponibili
+ */
+export const hasPasskeysAvailable = async (): Promise<boolean> => {
+  // Verifica supporto base
+  if (!isWebAuthnSupported()) {
+    return false;
+  }
+
+  // 1. Verifica se c'è un passkey_id salvato in localStorage
+  // Questo è l'indicatore più affidabile che l'utente ha già una passkey
+  const savedPasskeyId = localStorage.getItem('30diciaccio_passkey_id');
+  if (savedPasskeyId) {
+    console.log('[WebAuthn] ✅ Passkey ID trovato in localStorage');
+    return true;
+  }
+
+  // 2. Tenta una verifica silenziosa con Conditional Mediation (se supportato)
+  // Questo funziona solo su alcuni browser moderni (Chrome 108+, Safari 16.4+)
+  try {
+    const challenge = new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+
+    const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
+      challenge,
+      timeout: 100, // Timeout breve per verifica silenziosa
+      rpId: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'localhost'
+        : window.location.hostname,
+      userVerification: 'preferred',
+      // Non specificare allowCredentials per permettere al browser di cercare tutte le passkey
+    };
+
+    // Tenta una verifica silenziosa (senza UI)
+    // Nota: questo potrebbe non funzionare su tutti i browser
+    // Alcuni browser richiedono comunque interazione dell'utente
+    const assertion = await navigator.credentials.get({
+      publicKey: publicKeyCredentialRequestOptions,
+      // @ts-ignore - mediation: 'silent' potrebbe non essere nel tipo TypeScript
+      mediation: 'silent' as CredentialMediationRequirement,
+    }) as PublicKeyCredential | null;
+
+    if (assertion) {
+      console.log('[WebAuthn] ✅ Passkey trovata tramite verifica silenziosa');
+      return true;
+    }
+  } catch (error: any) {
+    // Se riceviamo NotFoundError, significa che non ci sono passkey
+    // Altri errori potrebbero indicare problemi di supporto o sicurezza
+    if (error.name === 'NotFoundError') {
+      console.log('[WebAuthn] ℹ️ Nessuna passkey trovata (NotFoundError)');
+      return false;
+    }
+    // Altri errori (NotAllowedError, SecurityError, ecc.) non sono conclusivi
+    // Potrebbero indicare che il browser non supporta la verifica silenziosa
+    console.log('[WebAuthn] ⚠️ Verifica silenziosa non disponibile:', error.name);
+  }
+
+  // 3. Verifica se c'è almeno un autenticatore di piattaforma disponibile
+  // Questo non garantisce che ci siano passkey salvate, ma indica che il dispositivo
+  // supporta passkey e potrebbe averne salvate
+  const hasPlatformAuth = await isPlatformAuthenticatorAvailable();
+  if (hasPlatformAuth) {
+    console.log('[WebAuthn] ℹ️ Autenticatore di piattaforma disponibile (possibili passkey)');
+    // Non restituiamo true qui perché non garantisce che ci siano passkey salvate
+    // ma potrebbe essere un indicatore positivo
+  }
+
+  // Se non abbiamo trovato indicatori chiari, assumiamo che non ci siano passkey
+  // L'utente può comunque provare a fare login e il browser gestirà l'errore
+  console.log('[WebAuthn] ❌ Nessun indicatore di passkey disponibili trovato');
+  return false;
+};
+
+/**
  * Registra una nuova passkey per l'utente
  */
 export const registerPasskey = async (

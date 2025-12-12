@@ -34,3 +34,4 @@ USING (
 -- ✅ Policy create!
 -- Ora gli utenti possono caricare avatar durante la registrazione
 
+

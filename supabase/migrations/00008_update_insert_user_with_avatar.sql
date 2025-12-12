@@ -56,3 +56,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION insert_user_with_passkey TO anon, authenticated;
 
+

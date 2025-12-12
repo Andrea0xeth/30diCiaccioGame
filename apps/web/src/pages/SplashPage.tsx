@@ -856,31 +856,31 @@ export const SplashPage: React.FC = () => {
               </p>
               
               <button
-                onClick={handleLogin}
+                onClick={handleRegister}
                 disabled={authLoading}
                 className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform duration-75"
+              >
+                <Sparkles size={18} />
+                Registrati (Nuovo Account)
+              </button>
+              
+              <button
+                onClick={handleLogin}
+                disabled={authLoading}
+                className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-gray-400 hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all duration-75 border border-gray-600/30 rounded-xl hover:border-gray-500/50"
               >
                 {authLoading ? (
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full"
                   />
                 ) : (
                   <>
-                    <Fingerprint size={18} />
+                    <Fingerprint size={16} />
                     Accedi con Passkey
                   </>
                 )}
-              </button>
-              
-              <button
-                onClick={handleRegister}
-                disabled={authLoading}
-                className="btn-secondary w-full flex items-center justify-center gap-2 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform duration-75"
-              >
-                <Sparkles size={18} />
-                Registrati (Nuovo Account)
               </button>
               
               <button

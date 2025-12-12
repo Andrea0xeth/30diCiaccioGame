@@ -125,3 +125,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION get_classifica_gara TO anon, authenticated;
 
+

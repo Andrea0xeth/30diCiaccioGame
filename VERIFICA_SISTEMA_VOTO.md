@@ -90,3 +90,4 @@ Il flusso completo funziona:
 3. Utenti votano → `votaProva()` → Inserisce voto → Trigger aggiorna automaticamente
 4. Se >= 66% → Trigger valida → Assegna punti → Crea notifica
 
+

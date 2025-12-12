@@ -113,3 +113,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 GRANT EXECUTE ON FUNCTION assign_daily_quests_to_all_users TO anon, authenticated;
 
+
