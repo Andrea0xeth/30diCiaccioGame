@@ -33,6 +33,7 @@ export const HomePage: React.FC = () => {
   );
   
   const pendingVerificationsCount = pendingVerifications.length;
+  const unreadNotifiche = notifiche.filter(n => !n.letta).length;
 
   const nextGara = gare.find(g => g.stato !== 'completata');
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bell, CheckCircle2, Trophy, Gift, Zap } from 'lucide-react';
+import { X, Bell, Trophy, Gift, Zap } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { supabase } from '../lib/supabase';
 import type { Notifica } from '../types';
@@ -41,8 +41,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
     if (!user) return;
 
     try {
-      await supabase
-        .from('notifiche')
+      await (supabase
+        .from('notifiche') as any)
         .update({ letta: true })
         .eq('id', notificaId)
         .eq('user_id', user.id);
@@ -58,8 +58,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
     if (!user || unreadCount === 0) return;
 
     try {
-      await supabase
-        .from('notifiche')
+      await (supabase
+        .from('notifiche') as any)
         .update({ letta: true })
         .eq('user_id', user.id)
         .eq('letta', false);
