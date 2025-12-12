@@ -25,28 +25,69 @@ export const sendPushNotification = async (
   payload: PushNotificationPayload
 ): Promise<boolean> => {
   if (!isSupabaseConfigured()) {
-    console.error('Supabase non configurato');
+    console.error('[Push] Supabase non configurato');
     return false;
   }
 
   try {
+    console.log('[Push] Invio notifica a utente:', userId, payload);
+    
     // Chiama la Edge Function per inviare la notifica push
     // La Edge Function userà web-push per inviare la notifica
-    const { error } = await supabase.functions.invoke('send-push-notification', {
+    const { data, error } = await supabase.functions.invoke('send-push-notification', {
       body: {
         user_id: userId,
         payload,
       },
     });
 
+    console.log('[Push] Risposta Edge Function:', { data, error });
+
     if (error) {
-      console.error('Errore invio notifica push:', error);
+      console.error('[Push] Errore invio notifica push:', error);
+      // Se l'errore contiene un messaggio, mostralo
+      if (error.message) {
+        console.error('[Push] Messaggio errore:', error.message);
+      }
       return false;
     }
 
-    return true;
-  } catch (err) {
-    console.error('Errore invio notifica push:', err);
+    // La Edge Function restituisce { success: true, sent: number, failed: number, ... }
+    if (data) {
+      if (typeof data === 'object' && 'error' in data) {
+        console.error('[Push] Errore nella risposta:', data.error);
+        return false;
+      }
+      
+      if ('success' in data) {
+        const sent = data.sent || 0;
+        const total = data.total || 0;
+        console.log(`[Push] Notifiche inviate: ${sent}/${total}`);
+        
+        if (data.success === true && sent > 0) {
+          return true;
+        } else if (sent === 0 && total > 0) {
+          console.warn('[Push] Nessuna notifica inviata (utente potrebbe non avere subscription attive)');
+          return false;
+        } else if (total === 0) {
+          console.warn('[Push] Nessuna subscription trovata per l\'utente');
+          return false;
+        }
+      }
+    }
+
+    // Se non c'è una risposta strutturata, considera fallimento
+    console.warn('[Push] Risposta non valida dalla Edge Function');
+    return false;
+  } catch (err: any) {
+    console.error('[Push] Errore invio notifica push:', err);
+    // Mostra un messaggio più dettagliato
+    if (err.message) {
+      console.error('[Push] Dettagli errore:', err.message);
+    }
+    if (err.stack) {
+      console.error('[Push] Stack trace:', err.stack);
+    }
     return false;
   }
 };

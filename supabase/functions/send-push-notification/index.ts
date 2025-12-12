@@ -11,16 +11,20 @@ import webpush from "https://esm.sh/web-push@3.6.6"
 const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY') || ''
 const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') || ''
 
+// CORS headers da includere in tutte le risposte
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Max-Age': '86400',
+}
+
 serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      },
+      headers: corsHeaders,
     })
   }
 
@@ -33,7 +37,7 @@ serve(async (req) => {
           status: 405, 
           headers: { 
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            ...corsHeaders,
           } 
         }
       )
@@ -44,7 +48,13 @@ serve(async (req) => {
     if (!user_id || !payload) {
       return new Response(
         JSON.stringify({ error: 'user_id and payload are required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 400, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
       )
     }
 
@@ -56,7 +66,13 @@ serve(async (req) => {
           error: 'VAPID keys not configured',
           message: 'Configura VAPID_PUBLIC_KEY e VAPID_PRIVATE_KEY nelle variabili d\'ambiente della Edge Function'
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
       )
     }
 
@@ -76,7 +92,13 @@ serve(async (req) => {
       console.error('Error fetching subscriptions:', subError)
       return new Response(
         JSON.stringify({ error: 'Error fetching subscriptions', details: subError.message }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 500, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
       )
     }
 
@@ -87,7 +109,13 @@ serve(async (req) => {
           count: 0,
           message: 'No active subscriptions found for this user'
         }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
+        { 
+          status: 404, 
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders,
+          } 
+        }
       )
     }
 
@@ -208,9 +236,7 @@ serve(async (req) => {
         status: 200, 
         headers: { 
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+          ...corsHeaders,
         } 
       }
     )
@@ -225,7 +251,7 @@ serve(async (req) => {
         status: 500, 
         headers: { 
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          ...corsHeaders,
         } 
       }
     )

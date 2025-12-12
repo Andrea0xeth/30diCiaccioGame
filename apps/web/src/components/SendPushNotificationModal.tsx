@@ -42,8 +42,11 @@ export const SendPushNotificationModal: React.FC<SendPushNotificationModalProps>
         url: '/',
       };
 
+      console.log('[PushModal] Invio notifica:', { recipientType, payload });
+
       let success = false;
       let count = 0;
+      let errorMessage = '';
 
       switch (recipientType) {
         case 'user':
@@ -52,8 +55,18 @@ export const SendPushNotificationModal: React.FC<SendPushNotificationModalProps>
             setIsSending(false);
             return;
           }
-          success = await sendPushNotification(selectedUserId, payload);
-          count = success ? 1 : 0;
+          console.log('[PushModal] Invio a utente:', selectedUserId);
+          try {
+            success = await sendPushNotification(selectedUserId, payload);
+            count = success ? 1 : 0;
+            if (!success) {
+              errorMessage = 'Impossibile inviare la notifica. Verifica che:\n- L\'utente abbia abilitato le notifiche push\n- Le chiavi VAPID siano configurate nell\'Edge Function\n- L\'Edge Function sia deployata correttamente';
+            }
+          } catch (err: any) {
+            console.error('[PushModal] Errore specifico:', err);
+            errorMessage = err.message || 'Errore durante l\'invio. Controlla la console per i dettagli.';
+            success = false;
+          }
           break;
 
         case 'squadra':
@@ -62,15 +75,25 @@ export const SendPushNotificationModal: React.FC<SendPushNotificationModalProps>
             setIsSending(false);
             return;
           }
+          console.log('[PushModal] Invio a squadra:', selectedSquadraId);
           count = await sendPushNotificationToSquadra(selectedSquadraId, payload);
           success = count > 0;
+          if (!success) {
+            errorMessage = `Nessuna notifica inviata. Verifica che gli utenti della squadra abbiano abilitato le notifiche push.`;
+          }
           break;
 
         case 'all':
+          console.log('[PushModal] Invio a tutti gli utenti');
           count = await sendPushNotificationToAll(payload);
           success = count > 0;
+          if (!success) {
+            errorMessage = `Nessuna notifica inviata. Verifica che ci siano utenti con notifiche push abilitate.`;
+          }
           break;
       }
+
+      console.log('[PushModal] Risultato:', { success, count });
 
       if (success) {
         setResult({
@@ -86,13 +109,16 @@ export const SendPushNotificationModal: React.FC<SendPushNotificationModalProps>
           setResult(null);
         }, 2000);
       } else {
-        setResult({ type: 'error', message: 'Errore durante l\'invio della notifica' });
+        setResult({ 
+          type: 'error', 
+          message: errorMessage || 'Errore durante l\'invio della notifica. Controlla la console per i dettagli.' 
+        });
       }
     } catch (error) {
-      console.error('Errore invio notifica:', error);
+      console.error('[PushModal] Errore invio notifica:', error);
       setResult({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Errore sconosciuto',
+        message: error instanceof Error ? error.message : 'Errore sconosciuto. Controlla la console per i dettagli.',
       });
     } finally {
       setIsSending(false);
