@@ -6,18 +6,25 @@ interface UsePWAUpdateOptions {
 
 export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
   // Aggiornamento automatico dopo 2 secondi (per dare tempo all'utente di vedere il messaggio)
-  const { autoUpdateDelay = 3000 } = options;
+  const { autoUpdateDelay = 2000 } = options;
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const autoUpdateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const updateServiceWorkerRef = useRef<(() => Promise<void>) | null>(null);
+  const hasTriggeredUpdateRef = useRef(false); // Flag per evitare doppi trigger
 
   const updateServiceWorker = useCallback(async () => {
     const currentRegistration = registration;
     if (!currentRegistration || !currentRegistration.waiting) {
       return;
     }
+
+    // Evita doppi trigger
+    if (hasTriggeredUpdateRef.current) {
+      return;
+    }
+    hasTriggeredUpdateRef.current = true;
 
     // Cancella l'aggiornamento automatico se era programmato
     if (autoUpdateTimeoutRef.current) {
@@ -103,8 +110,15 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
         registrationInstance = reg;
         setRegistration(reg);
 
+        // Se non c'è un service worker in attesa, resetta lo stato
+        if (!reg.waiting && !reg.installing) {
+          setUpdateAvailable(false);
+          hasTriggeredUpdateRef.current = false;
+          return;
+        }
+
         // Controlla se c'è un service worker in attesa
-        if (reg.waiting) {
+        if (reg.waiting && !hasTriggeredUpdateRef.current) {
           setUpdateAvailable(true);
           
           // Se è configurato l'aggiornamento automatico, programma il reload
@@ -121,7 +135,7 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
           const installingWorker = reg.installing;
           
           installingWorker.addEventListener('statechange', () => {
-            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller && !hasTriggeredUpdateRef.current) {
               // C'è un nuovo service worker installato e pronto
               setUpdateAvailable(true);
               
@@ -140,7 +154,7 @@ export const usePWAUpdate = (options: UsePWAUpdateOptions = {}) => {
           const newWorker = reg.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !hasTriggeredUpdateRef.current) {
                 // Nuovo service worker installato
                 setUpdateAvailable(true);
                 

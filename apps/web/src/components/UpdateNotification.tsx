@@ -1,20 +1,8 @@
 import { usePWAUpdate } from '../hooks/usePWAUpdate';
-import { useEffect } from 'react';
 
 export const UpdateNotification = () => {
-  const { updateAvailable, isUpdating, updateServiceWorker } = usePWAUpdate({ autoUpdateDelay: 2000 });
-
-  // Aggiorna automaticamente quando viene rilevato un aggiornamento
-  useEffect(() => {
-    if (updateAvailable && !isUpdating) {
-      // Aspetta 2 secondi per dare tempo all'utente di vedere il messaggio, poi aggiorna automaticamente
-      const timer = setTimeout(() => {
-        updateServiceWorker();
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [updateAvailable, isUpdating, updateServiceWorker]);
+  // L'hook gestisce già l'aggiornamento automatico con autoUpdateDelay
+  const { updateAvailable, isUpdating } = usePWAUpdate({ autoUpdateDelay: 2000 });
 
   if (!updateAvailable) {
     return null;
