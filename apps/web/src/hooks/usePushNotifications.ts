@@ -250,8 +250,8 @@ export const usePushNotifications = (userId?: string): UsePushNotificationsRetur
       console.log('[Push] Salvataggio nel database...');
 
       // Salva nel database - usa insert con onConflict invece di upsert
-      const { data: existingSub, error: checkError } = await supabase
-        .from('push_subscriptions')
+      const { data: existingSub, error: checkError } = await (supabase
+        .from('push_subscriptions') as any)
         .select('id')
         .eq('user_id', userId)
         .eq('endpoint', subscriptionData.endpoint)
@@ -265,21 +265,21 @@ export const usePushNotifications = (userId?: string): UsePushNotificationsRetur
       if (existingSub) {
         // Aggiorna subscription esistente
         console.log('[Push] Aggiorno subscription esistente...');
-        const { error: updateError } = await supabase
-          .from('push_subscriptions')
+        const { error: updateError } = await (supabase
+          .from('push_subscriptions') as any)
           .update({
             p256dh: subscriptionData.keys.p256dh,
             auth: subscriptionData.keys.auth,
             user_agent: navigator.userAgent,
             enabled: true,
           })
-          .eq('id', existingSub.id);
+          .eq('id', (existingSub as any).id);
         dbError = updateError;
       } else {
         // Inserisci nuova subscription
         console.log('[Push] Inserisco nuova subscription...');
-        const { error: insertError } = await supabase
-          .from('push_subscriptions')
+        const { error: insertError } = await (supabase
+          .from('push_subscriptions') as any)
           .insert({
             user_id: userId,
             endpoint: subscriptionData.endpoint,
