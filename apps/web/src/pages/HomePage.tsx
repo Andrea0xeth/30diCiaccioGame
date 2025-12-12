@@ -8,6 +8,7 @@ import { GaraCard } from '../components/GaraCard';
 import { CircusNeonDecorations } from '../components/CircusNeonDecorations';
 import { Avatar } from '../components/Avatar';
 import { PushNotificationSettings } from '../components/PushNotificationSettings';
+import { NotificationsModal } from '../components/NotificationsModal';
 
 export const HomePage: React.FC = () => {
   const { 
@@ -17,6 +18,7 @@ export const HomePage: React.FC = () => {
     gare, 
     proveInVerifica,
     gameState,
+    notifiche,
     submitProva,
     votaProva,
     logout
@@ -24,10 +26,13 @@ export const HomePage: React.FC = () => {
   
   const [showVerifica, setShowVerifica] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showNotifiche, setShowNotifiche] = useState(false);
 
   const pendingVerifications = proveInVerifica.filter(
     p => p.stato === 'in_verifica' && p.user_id !== user?.id
   );
+  
+  const pendingVerificationsCount = pendingVerifications.length;
 
   const nextGara = gare.find(g => g.stato !== 'completata');
 
@@ -50,18 +55,35 @@ export const HomePage: React.FC = () => {
             </div>
           </div>
           
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowVerifica(true)}
-            className="relative p-1.5"
-          >
-            <Bell size={20} className="text-gray-400" />
-            {pendingVerifications.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-coral-500 rounded-full text-[10px] font-bold flex items-center justify-center">
-                {pendingVerifications.length}
-              </span>
+          <div className="flex items-center gap-2">
+            {/* Notifiche */}
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowNotifiche(true)}
+              className="relative p-1.5"
+            >
+              <Bell size={20} className="text-gray-400" />
+              {unreadNotifiche > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-coral-500 rounded-full text-[10px] font-bold flex items-center justify-center text-white">
+                  {unreadNotifiche > 9 ? '9+' : unreadNotifiche}
+                </span>
+              )}
+            </motion.button>
+            
+            {/* Verifiche */}
+            {pendingVerificationsCount > 0 && (
+              <motion.button 
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowVerifica(true)}
+                className="relative p-1.5"
+              >
+                <CheckCircle2 size={20} className="text-gray-400" />
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-turquoise-500 rounded-full text-[10px] font-bold flex items-center justify-center text-white">
+                  {pendingVerificationsCount}
+                </span>
+              </motion.button>
             )}
-          </motion.button>
+          </div>
         </div>
 
         {/* Day Banner - Compact */}
@@ -266,6 +288,12 @@ export const HomePage: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Notifiche Modal */}
+      <NotificationsModal
+        isOpen={showNotifiche}
+        onClose={() => setShowNotifiche(false)}
+      />
     </div>
   );
 };
